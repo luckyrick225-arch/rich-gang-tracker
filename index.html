@@ -2,9 +2,8 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <!-- Responsive layout supporting mobile rotation, desktop site mode, and pinch zoom -->
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=0.5, maximum-scale=3.0, user-scalable=yes">
-    <title>Rich Gang Group - Executive Welfare & Contribution Tracker</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rich Gang Group - Member Welfare & Contribution Tracker</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- FontAwesome Icons -->
@@ -16,18 +15,13 @@
         .sticky-col-1 { position: sticky; left: 0; background-color: #090d16; z-index: 10; }
         .sticky-col-2 { position: sticky; left: 48px; background-color: #090d16; z-index: 10; }
         
-        /* Interactive Row Selection & Touch Highlighting */
         tr.member-row {
             transition: background-color 0.15s ease-in-out, border-color 0.15s ease-in-out;
-            cursor: pointer;
         }
-        tr.member-row:hover, tr.member-row:focus-within, tr.member-row.selected-row {
-            background-color: #1a170e !important; /* Elegant dark-gold glow */
+        tr.member-row:hover, tr.member-row:focus-within {
+            background-color: #1a170e !important;
         }
-        tr.member-row:hover .sticky-col-1, 
-        tr.member-row:hover .sticky-col-2,
-        tr.member-row.selected-row .sticky-col-1,
-        tr.member-row.selected-row .sticky-col-2 {
+        tr.member-row:hover .sticky-col-1, tr.member-row:hover .sticky-col-2 {
             background-color: #1a170e !important;
         }
 
@@ -35,15 +29,9 @@
         ::-webkit-scrollbar-track { background: #0b0f19; }
         ::-webkit-scrollbar-thumb { background: #374151; border-radius: 4px; }
         ::-webkit-scrollbar-thumb:hover { background: #4b5563; }
-        #splash-screen { transition: opacity 0.6s ease-out, visibility 0.6s ease-out; }
-        #splash-screen.fade-out { opacity: 0; visibility: hidden; }
 
-        /* AUTO-RESIZING PRINT / PDF STYLES */
         @media print {
-            @page {
-                size: landscape;
-                margin: 8mm;
-            }
+            @page { size: landscape; margin: 8mm; }
             .no-print { display: none !important; }
             .print-only { display: block !important; }
             body { background: white !important; color: black !important; padding: 0 !important; margin: 0 !important; }
@@ -75,24 +63,54 @@
 </head>
 <body class="bg-[#07090e] text-slate-100 min-h-screen flex flex-col antialiased selection:bg-amber-500 selection:text-slate-950">
 
-    <!-- SPLASH SCREEN -->
-    <div id="splash-screen" onclick="dismissSplash()" class="fixed inset-0 bg-[#04060a] z-50 flex flex-col items-center justify-center p-4 cursor-pointer no-print select-none">
-        <div class="relative flex flex-col items-center max-w-sm text-center space-y-6">
-            <div class="relative group">
-                <div class="absolute -inset-2 bg-gradient-to-r from-amber-500 via-amber-300 to-yellow-600 rounded-full blur-2xl opacity-60 animate-pulse"></div>
-                <img src="319995_11b2d9.jpg" alt="Rich Gang Logo" class="relative w-44 h-44 rounded-full object-cover border-4 border-amber-400 shadow-2xl ring-4 ring-amber-500/20">
-            </div>
-            <div class="space-y-1">
-                <h1 class="text-3xl font-black text-white tracking-wider uppercase bg-gradient-to-r from-white via-amber-100 to-amber-300 bg-clip-text text-transparent">Rich Gang Group</h1>
-                <p class="text-xs font-bold text-amber-400 tracking-widest uppercase">Executive Welfare & Contribution Tracker</p>
-                <div class="pt-2 text-[11px] text-slate-300 font-medium tracking-wide space-y-0.5">
-                    <p>Designed by <span class="text-amber-400 font-bold">Luwagga Derick</span></p>
-                    <p><a href="tel:+256768350920" onclick="event.stopPropagation()" class="text-emerald-400 hover:text-emerald-300 font-semibold underline inline-flex items-center gap-1"><i class="fa-solid fa-phone text-[10px]"></i> Contact: +256768350920</a></p>
+    <!-- MANDATORY USER REGISTRATION / LOGIN OVERLAY -->
+    <div id="modal-user-auth" class="fixed inset-0 bg-[#04060a] z-50 flex items-center justify-center p-4 select-none no-print">
+        <div class="bg-[#0b0f19] rounded-2xl max-w-md w-full p-6 shadow-2xl border border-amber-500/30 space-y-5">
+            <div class="text-center space-y-2">
+                <div class="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-gradient-to-tr from-amber-500 to-yellow-300 text-slate-950 font-black text-2xl shadow-lg border border-amber-300">
+                    RG
                 </div>
+                <h2 class="text-2xl font-black text-white uppercase tracking-wider">Rich Gang Group</h2>
+                <p class="text-xs text-amber-400 font-bold tracking-widest uppercase">Member Welfare Portal Access</p>
+                <p class="text-[11px] text-slate-400">Please register or log in with your phone number to access the portal.</p>
             </div>
-            <div class="flex items-center space-x-2 text-xs text-amber-300/80 bg-amber-500/10 px-4 py-2 rounded-full border border-amber-500/20 animate-bounce">
-                <span>Click anywhere to open portal</span>
-                <i class="fa-solid fa-arrow-right"></i>
+
+            <form id="form-user-register" onsubmit="handleUserRegistration(event)" class="space-y-4">
+                <div>
+                    <label class="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-1.5">Surname *</label>
+                    <input type="text" id="reg-surname" placeholder="e.g. Luwagga" required class="w-full px-4 py-2.5 bg-[#07090e] border border-slate-700 rounded-xl text-sm text-slate-100 focus:outline-none focus:ring-2 focus:ring-amber-500">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-1.5">Other Name(s) *</label>
+                    <input type="text" id="reg-othername" placeholder="e.g. Derick" required class="w-full px-4 py-2.5 bg-[#07090e] border border-slate-700 rounded-xl text-sm text-slate-100 focus:outline-none focus:ring-2 focus:ring-amber-500">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-1.5">Phone Number *</label>
+                    <div class="flex gap-2">
+                        <select id="reg-country-code" class="px-2.5 py-2.5 bg-[#07090e] border border-slate-700 rounded-xl text-xs text-amber-400 font-bold focus:outline-none focus:ring-2 focus:ring-amber-500">
+                            <option value="+256" selected>🇺🇬 UG (+256)</option>
+                            <option value="+254">🇰🇪 KE (+254)</option>
+                            <option value="+255">🇹🇿 TZ (+255)</option>
+                            <option value="+250">🇷🇼 RW (+250)</option>
+                            <option value="+257">🇧🇮 BI (+257)</option>
+                            <option value="+211">🇸🇸 SS (+211)</option>
+                            <option value="+27">🇿🇦 ZA (+27)</option>
+                            <option value="+234">🇳🇬 NG (+234)</option>
+                            <option value="+44">🇬🇧 UK (+44)</option>
+                            <option value="+1">🇺🇸 US (+1)</option>
+                            <option value="+971">🇦🇪 UAE (+971)</option>
+                        </select>
+                        <input type="tel" id="reg-phone" placeholder="768350920" required class="w-full px-4 py-2.5 bg-[#07090e] border border-slate-700 rounded-xl text-sm text-slate-100 focus:outline-none focus:ring-2 focus:ring-amber-500">
+                    </div>
+                </div>
+                <button type="submit" class="w-full py-3 bg-gradient-to-r from-amber-500 to-yellow-500 hover:from-amber-400 hover:to-yellow-400 text-slate-950 font-black rounded-xl text-sm uppercase tracking-wider shadow-lg shadow-amber-500/20 transition">
+                    Enter Portal
+                </button>
+            </form>
+
+            <div class="text-center pt-2 border-t border-slate-800 text-[10px] text-slate-400 space-y-0.5">
+                <p>Rich Gang System &bull; Designed by <span class="text-amber-400 font-bold">Luwagga Derick</span></p>
+                <p><a href="tel:+256768350920" class="text-emerald-400 font-semibold underline">Contact: +256768350920</a></p>
             </div>
         </div>
     </div>
@@ -104,7 +122,7 @@
                 <h1 class="text-xl font-extrabold text-black uppercase">Rich Gang Group Welfare Report</h1>
                 <p class="text-xs text-gray-600 mt-0.5">Generated on: <span id="print-date"></span> | Designer: Luwagga Derick (+256768350920)</p>
             </div>
-            <img src="319995_11b2d9.jpg" alt="Logo" class="w-10 h-10 rounded-full border border-gray-400 object-cover">
+            <div class="px-3 py-1 bg-amber-500 text-slate-950 font-black rounded text-sm">RICH GANG GROUP</div>
         </div>
     </div>
 
@@ -113,11 +131,13 @@
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3.5">
             <div class="flex flex-col md:flex-row justify-between items-center gap-4">
                 <div class="flex items-center space-x-3.5">
-                    <img src="319995_11b2d9.jpg" alt="Rich Gang Logo" class="w-11 h-11 rounded-full object-cover border-2 border-amber-400 shadow-lg ring-2 ring-amber-400/30">
+                    <div class="flex items-center justify-center px-3 py-2 rounded-xl bg-gradient-to-tr from-amber-500 via-amber-400 to-yellow-300 text-slate-950 font-black text-sm tracking-wider uppercase shadow-md border border-amber-300 ring-2 ring-amber-500/20">
+                        Rich Gang Group
+                    </div>
                     <div>
                         <h1 class="text-lg font-black tracking-tight text-white flex items-center gap-2">
                             Rich Gang Group
-                            <span class="text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-amber-500/10 text-amber-400 border border-amber-500/30">Executive Welfare</span>
+                            <span class="text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-amber-500/10 text-amber-400 border border-amber-500/30">Member Welfare</span>
                         </h1>
                         <p class="text-xs text-slate-400">
                             Designer: <span class="text-amber-400 font-semibold">Luwagga Derick</span> &bull; 
@@ -127,13 +147,12 @@
                 </div>
 
                 <div class="flex flex-wrap items-center gap-2">
-                    <!-- IN-PAGE INSTANT REFRESH BUTTON (NO PAGE RELOAD) -->
-                    <button id="manual-refresh-btn" onclick="triggerManualRefresh()" class="px-3 py-1.5 bg-slate-900 hover:bg-slate-800 text-amber-400 border border-amber-500/30 font-semibold rounded-lg text-xs flex items-center gap-1.5 transition shadow-sm active:scale-95">
-                        <i id="refresh-icon" class="fa-solid fa-arrows-rotate"></i>
-                        <span>Refresh</span>
-                    </button>
+                    <div id="user-profile-badge" class="px-3 py-1.5 bg-slate-900 border border-slate-700 rounded-lg text-xs flex items-center gap-2 text-slate-300">
+                        <i class="fa-solid fa-user-circle text-amber-400 text-sm"></i>
+                        <span id="active-user-name" class="font-bold text-white">User</span>
+                        <button onclick="logoutUser()" title="Logout from device" class="ml-1 text-red-400 hover:text-red-300 font-semibold underline text-[11px]"><i class="fa-solid fa-right-from-bracket"></i> Logout</button>
+                    </div>
 
-                    <!-- Admin Viewers Metric Calculation Badge -->
                     <div id="admin-viewer-metrics-badge" class="hidden px-3 py-1.5 bg-slate-900 border border-amber-500/30 rounded-lg text-xs flex items-center gap-2">
                         <i class="fa-solid fa-calculator text-amber-400"></i>
                         <span class="text-slate-300 font-semibold">Audited: <strong id="admin-calc-total" class="text-amber-400">0</strong> Members (<span id="admin-calc-verified" class="text-emerald-400">0</span> Verified)</span>
@@ -141,28 +160,43 @@
 
                     <div id="role-badge-container" class="mr-1">
                         <button id="auth-toggle-btn" class="px-3 py-1.5 bg-slate-900 hover:bg-slate-800 text-slate-200 border border-slate-700 font-semibold rounded-lg text-xs flex items-center gap-2 transition shadow-sm">
-                            <i class="fa-solid fa-eye text-sky-400"></i> Mode: <span id="current-role-text" class="text-sky-400 font-bold">Viewer (Locked)</span>
+                            <i id="role-icon" class="fa-solid fa-eye text-sky-400"></i> Mode: <span id="current-role-text" class="text-sky-400 font-bold">Viewer (Locked)</span>
                         </button>
                     </div>
+
+                    <button id="share-btn" onclick="shareGroupReport()" class="px-3.5 py-1.5 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold rounded-lg text-xs flex items-center gap-2 transition shadow-md">
+                        <i class="fa-solid fa-share-nodes text-sm"></i> Share
+                    </button>
 
                     <a href="https://chat.whatsapp.com/JoSheTMGDhHD9zEWXEgSW4" target="_blank" rel="noopener noreferrer" class="px-3 py-1.5 bg-emerald-950/80 hover:bg-emerald-900 text-emerald-300 border border-emerald-700/50 font-semibold rounded-lg text-xs flex items-center gap-1.5 transition shadow-sm">
                         <i class="fa-brands fa-whatsapp text-emerald-400 text-sm"></i> Join WhatsApp
                     </a>
 
                     <div id="admin-actions-group" class="hidden flex flex-wrap items-center gap-2">
-                        <button id="add-list-btn" class="px-3 py-1.5 bg-amber-500 hover:bg-amber-400 text-slate-950 font-extrabold rounded-lg text-xs flex items-center gap-1.5 transition shadow-md">
+                        <button id="reg-users-btn" onclick="openRegUsersModal()" class="px-3 py-1.5 bg-purple-600 hover:bg-purple-500 text-white font-bold rounded-lg text-xs flex items-center gap-1.5 transition shadow-md">
+                            <i class="fa-solid fa-users-gear"></i> Reg. Users Directory
+                        </button>
+                        <button id="add-list-btn" onclick="openAddListModal()" class="px-3 py-1.5 bg-amber-500 hover:bg-amber-400 text-slate-950 font-extrabold rounded-lg text-xs flex items-center gap-1.5 transition shadow-md">
                             <i class="fa-solid fa-plus-circle"></i> Add List
                         </button>
-                        <button id="add-member-btn" class="px-3 py-1.5 bg-indigo-600 hover:bg-indigo-500 text-white font-semibold rounded-lg text-xs flex items-center gap-1.5 transition shadow-md">
+                        <button id="add-member-btn" onclick="openAddMemberModal()" class="px-3 py-1.5 bg-indigo-600 hover:bg-indigo-500 text-white font-semibold rounded-lg text-xs flex items-center gap-1.5 transition shadow-md">
                             <i class="fa-solid fa-user-plus"></i> Add Member
                         </button>
-                        <button id="reset-data-btn" title="Reset Data" class="p-2 text-slate-400 hover:text-red-400 hover:bg-slate-800 rounded-lg transition border border-slate-700">
-                            <i class="fa-solid fa-rotate-right text-xs"></i>
+                        <button id="trash-bin-btn" onclick="openTrashModal()" title="Trash Bin (Deleted Lists)" class="relative p-2 bg-slate-900 hover:bg-slate-800 text-red-400 rounded-lg transition border border-slate-700">
+                            <i class="fa-solid fa-trash-can text-xs"></i>
+                            <span id="trash-badge" class="absolute -top-1 -right-1 bg-red-500 text-white text-[9px] font-bold px-1 rounded-full hidden">0</span>
                         </button>
                     </div>
 
+                    <button id="refresh-data-btn" onclick="manualRefresh()" title="Refresh Data Instantly" class="px-3 py-1.5 bg-slate-900 hover:bg-slate-800 text-slate-300 rounded-lg text-xs flex items-center gap-1.5 border border-slate-700/80 transition">
+                        <i id="refresh-icon" class="fa-solid fa-rotate text-sky-400"></i> Refresh
+                    </button>
+
                     <div class="h-5 w-px bg-slate-800 mx-1 hidden sm:block"></div>
                     
+                    <button id="export-html-btn" onclick="exportUpdatedHTML()" title="Download updated HTML file" class="px-3 py-1.5 bg-sky-600 hover:bg-sky-500 text-white font-bold rounded-lg text-xs flex items-center gap-1.5 transition shadow-md">
+                        <i class="fa-solid fa-file-code"></i> Save HTML File
+                    </button>
                     <button id="export-csv-btn" class="px-3 py-1.5 bg-slate-900 hover:bg-slate-800 text-slate-300 rounded-lg text-xs flex items-center gap-1.5 border border-slate-700/80 transition">
                         <i class="fa-solid fa-file-csv text-emerald-400"></i> CSV
                     </button>
@@ -208,7 +242,7 @@
             </div>
         </div>
 
-        <!-- Independent Subtotal Cards Deck -->
+        <!-- Subtotal Cards Deck -->
         <div class="no-print">
             <div class="flex items-center justify-between mb-3">
                 <h2 class="text-xs font-bold uppercase tracking-widest text-slate-400 flex items-center gap-2">
@@ -267,12 +301,164 @@
 
         <!-- FOOTER SIGNATURE -->
         <footer class="text-center py-6 text-xs text-slate-400 border-t border-slate-800/60 space-y-1.5 no-print">
-            <p>Rich Gang Group Executive Welfare Tracker &bull; Designed & Developed by <span class="text-amber-400 font-bold">Luwagga Derick</span></p>
+            <p>Rich Gang Group Member Welfare Tracker &bull; Designed & Developed by <span class="text-amber-400 font-bold">Luwagga Derick</span></p>
             <p><a href="tel:+256768350920" class="text-emerald-400 hover:text-emerald-300 font-semibold underline inline-flex items-center gap-1"><i class="fa-solid fa-phone text-[10px]"></i> Contact: +256768350920</a></p>
         </footer>
     </main>
 
-    <!-- PROFESSIONAL EDIT MEMBER MODAL -->
+    <!-- REGISTERED USERS DIRECTORY SUB-PAGE (MAIN ADMIN ONLY) -->
+    <div id="modal-reg-users" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-50 flex items-center justify-center hidden no-print">
+        <div class="bg-[#0b0f19] rounded-2xl max-w-2xl w-full mx-4 shadow-2xl border border-purple-500/30 overflow-hidden flex flex-col max-h-[85vh]">
+            <div class="bg-[#04060a] px-6 py-4 flex justify-between items-center text-white border-b border-slate-800">
+                <h3 class="font-bold text-base flex items-center gap-2 text-purple-400">
+                    <i class="fa-solid fa-users-gear"></i>
+                    Registered System Users Directory
+                </h3>
+                <button onclick="closeRegUsersModal()" class="text-slate-400 hover:text-white text-lg"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="p-4 border-b border-slate-800 bg-[#07090e]">
+                <input type="text" id="reg-users-search" oninput="renderRegUsersList()" placeholder="Filter users by name or phone..." class="w-full px-4 py-2 bg-slate-900 border border-slate-700 rounded-lg text-xs text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-purple-500">
+            </div>
+            <div id="reg-users-container" class="p-4 flex-grow overflow-y-auto space-y-2">
+                <!-- Registered users dynamically rendered -->
+            </div>
+            <div class="p-4 border-t border-slate-800 bg-[#04060a]/60 flex items-center justify-between">
+                <span id="reg-users-count" class="text-xs font-semibold text-slate-400">Total Registered Users: 0</span>
+                <div class="flex gap-2">
+                    <button onclick="exportRegUsersCSV()" class="px-3.5 py-2 text-xs font-bold text-slate-950 bg-purple-400 hover:bg-purple-300 rounded-lg transition">Export CSV</button>
+                    <button onclick="closeRegUsersModal()" class="px-4 py-2 text-xs font-semibold text-slate-300 hover:bg-slate-800 rounded-lg transition">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- SHARE PREVIEW MODAL -->
+    <div id="modal-share-preview" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-50 flex items-center justify-center hidden no-print">
+        <div class="bg-[#0b0f19] rounded-2xl max-w-lg w-full mx-4 shadow-2xl border border-emerald-500/30 overflow-hidden flex flex-col max-h-[85vh]">
+            <div class="bg-[#04060a] px-6 py-4 flex justify-between items-center text-white border-b border-slate-800">
+                <h3 class="font-bold text-base flex items-center gap-2">
+                    <i class="fa-solid fa-share-nodes text-emerald-400"></i>
+                    Share Member Welfare Report
+                </h3>
+                <button onclick="closeShareModal()" class="text-slate-400 hover:text-white text-lg"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="p-4 flex-grow overflow-y-auto">
+                <textarea id="share-text-area" readonly class="w-full h-64 p-3 bg-[#07090e] border border-slate-700 rounded-xl text-xs font-mono text-slate-200 focus:outline-none resize-none"></textarea>
+            </div>
+            <div class="p-4 border-t border-slate-800 bg-[#04060a]/60 flex items-center justify-between gap-3">
+                <span class="text-[11px] text-slate-400">Ready to share across WhatsApp, Imo, SMS</span>
+                <div class="flex gap-2">
+                    <button onclick="closeShareModal()" class="px-3.5 py-2 text-xs font-semibold text-slate-300 hover:bg-slate-800 rounded-lg transition">Close</button>
+                    <button onclick="copyShareText()" class="px-4 py-2 text-xs font-bold text-slate-950 bg-emerald-400 hover:bg-emerald-300 rounded-lg transition flex items-center gap-1.5 shadow-md">
+                        <i class="fa-solid fa-copy"></i> Copy Text
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- TRASH BIN MODAL -->
+    <div id="modal-trash" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-50 flex items-center justify-center hidden no-print">
+        <div class="bg-[#0b0f19] rounded-2xl max-w-md w-full mx-4 shadow-2xl border border-red-500/30 overflow-hidden flex flex-col max-h-[80vh]">
+            <div class="bg-[#04060a] px-6 py-4 flex justify-between items-center text-white border-b border-slate-800">
+                <h3 class="font-bold text-base flex items-center gap-2 text-red-400">
+                    <i class="fa-solid fa-trash-can"></i>
+                    Deleted Lists (Trash Bin)
+                </h3>
+                <button onclick="closeTrashModal()" class="text-slate-400 hover:text-white text-lg"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div id="trash-list-container" class="p-4 flex-grow overflow-y-auto space-y-3"></div>
+            <div class="p-4 border-t border-slate-800 bg-[#04060a]/60 flex justify-end">
+                <button onclick="closeTrashModal()" class="px-4 py-2 text-xs font-semibold text-slate-300 hover:bg-slate-800 rounded-lg transition">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- EDIT LIST MODAL -->
+    <div id="modal-edit-list" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-50 flex items-center justify-center hidden no-print">
+        <div class="bg-[#0b0f19] rounded-2xl max-w-md w-full mx-4 shadow-2xl border border-amber-500/30 overflow-hidden transform transition-all">
+            <div class="bg-[#04060a] px-6 py-4 flex justify-between items-center text-white border-b border-slate-800">
+                <h3 class="font-bold text-base flex items-center gap-2">
+                    <i class="fa-solid fa-pen-to-square text-amber-400"></i>
+                    Edit Contribution List / Fund
+                </h3>
+                <button onclick="closeEditListModal()" class="text-slate-400 hover:text-white text-lg"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="p-6 space-y-4">
+                <input type="hidden" id="edit-list-id">
+                <div>
+                    <label class="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-2">List / Fund Title *</label>
+                    <input type="text" id="edit-list-name-input" class="w-full px-4 py-3 bg-[#07090e] border border-slate-700 rounded-xl text-sm text-slate-100 focus:outline-none focus:ring-2 focus:ring-amber-500">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-2">Target Amount per Member (UGX)</label>
+                    <input type="number" id="edit-list-target-input" class="w-full px-4 py-3 bg-[#07090e] border border-slate-700 rounded-xl text-sm text-slate-100 focus:outline-none focus:ring-2 focus:ring-amber-500">
+                </div>
+                <div class="pt-2 flex justify-end gap-3">
+                    <button type="button" onclick="closeEditListModal()" class="px-4 py-2.5 text-xs font-semibold text-slate-300 hover:bg-slate-800 rounded-xl transition">Cancel</button>
+                    <button type="button" onclick="saveEditedList()" class="px-5 py-2.5 text-xs font-bold text-slate-950 bg-amber-500 hover:bg-amber-400 rounded-xl transition shadow-md shadow-amber-500/20">
+                        Save Changes
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ADD MEMBER MODAL -->
+    <div id="modal-add-member" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-50 flex items-center justify-center hidden no-print">
+        <div class="bg-[#0b0f19] rounded-2xl max-w-md w-full mx-4 shadow-2xl border border-indigo-500/30 overflow-hidden transform transition-all">
+            <div class="bg-[#04060a] px-6 py-4 flex justify-between items-center text-white border-b border-slate-800">
+                <h3 class="font-bold text-base flex items-center gap-2">
+                    <i class="fa-solid fa-user-plus text-indigo-400"></i>
+                    Add New Member
+                </h3>
+                <button onclick="closeAddMemberModal()" class="text-slate-400 hover:text-white text-lg"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="p-6 space-y-4">
+                <div>
+                    <label class="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-2">Member Full Name *</label>
+                    <input type="text" id="new-member-name-input" placeholder="e.g. Namubiru Sarah" class="w-full px-4 py-3 bg-[#07090e] border border-slate-700 rounded-xl text-sm text-slate-100 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                </div>
+                <div class="pt-2 flex justify-end gap-3">
+                    <button type="button" onclick="closeAddMemberModal()" class="px-4 py-2.5 text-xs font-semibold text-slate-300 hover:bg-slate-800 rounded-xl transition">Cancel</button>
+                    <button type="button" onclick="saveNewMember()" class="px-5 py-2.5 text-xs font-bold text-white bg-indigo-600 hover:bg-indigo-500 rounded-xl transition shadow-md">
+                        Add Member
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ADD LIST MODAL -->
+    <div id="modal-add-list" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-50 flex items-center justify-center hidden no-print">
+        <div class="bg-[#0b0f19] rounded-2xl max-w-md w-full mx-4 shadow-2xl border border-amber-500/30 overflow-hidden transform transition-all">
+            <div class="bg-[#04060a] px-6 py-4 flex justify-between items-center text-white border-b border-slate-800">
+                <h3 class="font-bold text-base flex items-center gap-2">
+                    <i class="fa-solid fa-list-check text-amber-400"></i>
+                    Add New Contribution List / Fund
+                </h3>
+                <button onclick="closeAddListModal()" class="text-slate-400 hover:text-white text-lg"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="p-6 space-y-4">
+                <div>
+                    <label class="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-2">List / Fund Title *</label>
+                    <input type="text" id="new-list-name-input" placeholder="e.g. List 4: Party Contribution" class="w-full px-4 py-3 bg-[#07090e] border border-slate-700 rounded-xl text-sm text-slate-100 focus:outline-none focus:ring-2 focus:ring-amber-500">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-2">Target Amount per Member (UGX)</label>
+                    <input type="number" id="new-list-target-input" value="5000" class="w-full px-4 py-3 bg-[#07090e] border border-slate-700 rounded-xl text-sm text-slate-100 focus:outline-none focus:ring-2 focus:ring-amber-500">
+                </div>
+                <div class="pt-2 flex justify-end gap-3">
+                    <button type="button" onclick="closeAddListModal()" class="px-4 py-2.5 text-xs font-semibold text-slate-300 hover:bg-slate-800 rounded-xl transition">Cancel</button>
+                    <button type="button" onclick="saveNewList()" class="px-5 py-2.5 text-xs font-bold text-slate-950 bg-amber-500 hover:bg-amber-400 rounded-xl transition shadow-md">
+                        Create List
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- EDIT MEMBER MODAL -->
     <div id="modal-edit-member" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-50 flex items-center justify-center hidden no-print">
         <div class="bg-[#0b0f19] rounded-2xl max-w-md w-full mx-4 shadow-2xl border border-amber-500/30 overflow-hidden transform transition-all">
             <div class="bg-[#04060a] px-6 py-4 flex justify-between items-center text-white border-b border-slate-800">
@@ -286,19 +472,14 @@
                 <input type="hidden" id="edit-member-id">
                 <div>
                     <label class="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-2">Member Full Name *</label>
-                    <input type="text" id="edit-member-name-input" placeholder="Enter correct spelling..." class="w-full px-4 py-3 bg-[#07090e] border border-slate-700 rounded-xl text-sm text-slate-100 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500">
-                    <p class="text-[11px] text-slate-400 mt-2">Correct any spelling mistakes for accurate record keeping.</p>
+                    <input type="text" id="edit-member-name-input" placeholder="Enter correct spelling..." class="w-full px-4 py-3 bg-[#07090e] border border-slate-700 rounded-xl text-sm text-slate-100 focus:outline-none focus:ring-2 focus:ring-amber-500">
                 </div>
                 <div class="pt-2 flex justify-end gap-3">
                     <button type="button" onclick="closeEditModal()" class="px-4 py-2.5 text-xs font-semibold text-slate-300 hover:bg-slate-800 rounded-xl transition">Cancel</button>
-                    <button type="button" onclick="saveEditedMemberName()" class="px-5 py-2.5 text-xs font-bold text-slate-950 bg-amber-500 hover:bg-amber-400 rounded-xl transition shadow-md shadow-amber-500/20">
+                    <button type="button" onclick="saveEditedMemberName()" class="px-5 py-2.5 text-xs font-bold text-slate-950 bg-amber-500 hover:bg-amber-400 rounded-xl transition shadow-md">
                         Save Changes
                     </button>
                 </div>
-            </div>
-            <div class="bg-[#04060a]/60 px-6 py-3 border-t border-slate-800/80 text-[10px] text-slate-400 flex flex-col sm:flex-row justify-between items-center gap-1">
-                <span>Rich Gang Executive System &bull; Designer: Luwagga Derick</span>
-                <a href="tel:+256768350920" class="text-emerald-400 font-semibold underline">Contact: +256768350920</a>
             </div>
         </div>
     </div>
@@ -312,7 +493,7 @@
             </div>
             <form id="form-admin-login" class="p-6 space-y-4">
                 <div>
-                    <label class="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-1.5">Enter Admin Password *</label>
+                    <label class="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-1.5">Enter Password *</label>
                     <input type="password" id="input-admin-password" placeholder="Enter password" required class="w-full px-3.5 py-2.5 bg-[#07090e] border border-slate-700 rounded-lg text-sm text-slate-100 focus:outline-none focus:ring-2 focus:ring-amber-500">
                     <p id="login-error-msg" class="text-xs text-red-400 mt-1.5 hidden">Incorrect password. Please try again.</p>
                 </div>
@@ -370,65 +551,150 @@
             { name: "Ssekyondwa Edward", paidLists: ["list-2"] }
         ];
 
-        let appState = { lists: [], members: [], filter: 'all', search: '', isAdmin: false };
-        let autoRefreshTimer = null;
+        let appState = { 
+            lists: [], 
+            trashLists: [], 
+            members: [], 
+            registeredUsers: [],
+            currentUser: null,
+            filter: 'all', 
+            search: '', 
+            role: 'none' 
+        };
 
-        function dismissSplash() {
-            const splash = document.getElementById('splash-screen');
-            if (splash) splash.classList.add('fade-out');
+        function sortAlphabetically() {
+            appState.members.sort((a, b) => a.name.localeCompare(b.name, undefined, { sensitivity: 'accent' }));
+        }
+
+        function checkPersistentSession() {
+            const savedUser = localStorage.getItem('richgang_active_user');
+            if (savedUser) {
+                try {
+                    appState.currentUser = JSON.parse(savedUser);
+                    document.getElementById('modal-user-auth').classList.add('hidden');
+                    document.getElementById('active-user-name').textContent = appState.currentUser.surname + " " + appState.currentUser.otherName;
+                } catch(e) {
+                    localStorage.removeItem('richgang_active_user');
+                }
+            } else {
+                document.getElementById('modal-user-auth').classList.remove('hidden');
+            }
+        }
+
+        function handleUserRegistration(e) {
+            e.preventDefault();
+            const surname = document.getElementById('reg-surname').value.trim();
+            const otherName = document.getElementById('reg-othername').value.trim();
+            const countryCode = document.getElementById('reg-country-code').value;
+            const phone = document.getElementById('reg-phone').value.trim();
+
+            if (!surname || !otherName || !phone) {
+                alert("Please fill in all registration fields.");
+                return;
+            }
+
+            const userObj = {
+                id: 'usr-' + Date.now(),
+                surname: surname,
+                otherName: otherName,
+                fullName: surname + " " + otherName,
+                phone: countryCode + phone,
+                registeredAt: new Date().toLocaleString()
+            };
+
+            appState.currentUser = userObj;
+            localStorage.setItem('richgang_active_user', JSON.stringify(userObj));
+            
+            // Add or update user entry in system list and sync immediately
+            const existingIndex = appState.registeredUsers.findIndex(u => u.phone === userObj.phone);
+            if (existingIndex !== -1) {
+                appState.registeredUsers[existingIndex] = userObj;
+            } else {
+                appState.registeredUsers.push(userObj);
+            }
+            syncToCloud();
+
+            document.getElementById('modal-user-auth').classList.add('hidden');
+            document.getElementById('active-user-name').textContent = userObj.surname + " " + userObj.otherName;
+            showToast(`Welcome ${userObj.surname}! Session active.`);
+        }
+
+        function logoutUser() {
+            if (confirm("Are you sure you want to logout from this device? You will need to register/login again.")) {
+                localStorage.removeItem('richgang_active_user');
+                appState.currentUser = null;
+                document.getElementById('modal-user-auth').classList.remove('hidden');
+            }
         }
 
         async function initData() {
-            setTimeout(dismissSplash, 2500);
+            checkPersistentSession();
 
             const urlParams = new URLSearchParams(window.location.search);
-            if (urlParams.get('role') === 'admin') appState.isAdmin = true;
+            const roleParam = urlParams.get('role');
+            if (roleParam === 'main') appState.role = 'mainadmin';
+            else if (roleParam === 'katoma') appState.role = 'subadmin';
 
-            await loadCloudData();
+            await loadCloudData(false);
+            sortAlphabetically();
             renderApp();
 
-            // Background Live Refresh every 10 seconds without page reload
-            autoRefreshTimer = setInterval(() => {
+            // Ensure current active user is registered in pool
+            if (appState.currentUser && !appState.registeredUsers.some(u => u.phone === appState.currentUser.phone)) {
+                appState.registeredUsers.push(appState.currentUser);
+                syncToCloud();
+            }
+
+            setInterval(() => {
                 loadCloudData(true);
             }, 10000);
         }
 
-        async function triggerManualRefresh() {
-            const icon = document.getElementById('refresh-icon');
-            if (icon) icon.classList.add('fa-spin');
-            
-            await loadCloudData(false);
-            showToast("Tracker refreshed with live data!");
-
-            if (icon) {
-                setTimeout(() => icon.classList.remove('fa-spin'), 600);
-            }
-        }
-
-        async function loadCloudData(isBackgroundSilent = false) {
+        async function loadCloudData(isBackground = false) {
             if (API_URL) {
                 try {
                     const response = await fetch(API_URL);
                     const data = await response.json();
                     if (data && data.lists && data.members && data.lists.length > 0) {
                         appState.lists = data.lists;
+                        if (data.trashLists) appState.trashLists = data.trashLists;
+                        if (data.registeredUsers) appState.registeredUsers = data.registeredUsers;
                         appState.members = data.members;
+                        
+                        // Merge local user if not present in cloud payload
+                        if (appState.currentUser && !appState.registeredUsers.some(u => u.phone === appState.currentUser.phone)) {
+                            appState.registeredUsers.push(appState.currentUser);
+                        }
+
+                        sortAlphabetically();
                         renderApp();
+                        if (!isBackground) showToast("Data synchronized successfully!");
                         return;
                     }
                 } catch (e) {
-                    if (!isBackgroundSilent) {
-                        console.warn("Cloud load failed, initializing default data", e);
-                    }
+                    console.warn("Cloud load failed, using local state", e);
                 }
             }
-            if (!isBackgroundSilent && appState.members.length === 0) {
+            if (!appState.lists.length) {
                 loadDefaultData();
             }
         }
 
+        function manualRefresh() {
+            const icon = document.getElementById('refresh-icon');
+            icon.classList.add('fa-spin');
+            loadCloudData(false).finally(() => {
+                setTimeout(() => icon.classList.remove('fa-spin'), 600);
+            });
+        }
+
         function loadDefaultData() {
             appState.lists = JSON.parse(JSON.stringify(PRELOADED_LISTS));
+            appState.trashLists = [];
+            appState.registeredUsers = [];
+            if (appState.currentUser) {
+                appState.registeredUsers.push(appState.currentUser);
+            }
             appState.members = [];
 
             VERIFIED_NAMES.forEach((name, index) => {
@@ -451,10 +717,12 @@
                 });
             });
 
+            sortAlphabetically();
             syncToCloud();
         }
 
         async function syncToCloud() {
+            sortAlphabetically();
             renderApp();
             if (API_URL) {
                 try {
@@ -462,7 +730,12 @@
                         method: "POST",
                         mode: "no-cors",
                         headers: { "Content-Type": "application/json" },
-                        body: JSON.stringify({ lists: appState.lists, members: appState.members })
+                        body: JSON.stringify({ 
+                            lists: appState.lists, 
+                            trashLists: appState.trashLists, 
+                            members: appState.members,
+                            registeredUsers: appState.registeredUsers 
+                        })
                     });
                     showToast("Synced live to cloud Google Sheet!");
                 } catch (e) {
@@ -494,6 +767,7 @@
         }
 
         function renderApp() {
+            sortAlphabetically();
             renderAuthUI();
             renderListCards();
             renderHeaders();
@@ -504,24 +778,40 @@
 
         function renderAuthUI() {
             const roleText = document.getElementById('current-role-text');
-            const authBtn = document.getElementById('auth-toggle-btn');
+            const roleIcon = document.getElementById('role-icon');
             const adminActionsGroup = document.getElementById('admin-actions-group');
             const actionsTh = document.getElementById('th-actions-column');
             const actionsTdSub = document.getElementById('td-actions-subtotal');
             const adminViewerMetricsBadge = document.getElementById('admin-viewer-metrics-badge');
+            const trashBadge = document.getElementById('trash-badge');
 
-            if (appState.isAdmin) {
-                roleText.textContent = "Admin Link (Editable)";
+            if (appState.trashLists.length > 0) {
+                trashBadge.textContent = appState.trashLists.length;
+                trashBadge.classList.remove('hidden');
+            } else {
+                trashBadge.classList.add('hidden');
+            }
+
+            if (appState.role === 'mainadmin') {
+                roleText.textContent = "Main Group Admin";
                 roleText.className = "text-amber-400 font-bold";
-                authBtn.querySelector('i').className = "fa-solid fa-user-shield text-amber-400";
+                roleIcon.className = "fa-solid fa-crown text-amber-400";
                 adminActionsGroup.classList.remove('hidden');
                 actionsTh.classList.remove('hidden');
                 actionsTdSub.classList.remove('hidden');
                 adminViewerMetricsBadge.classList.remove('hidden');
+            } else if (appState.role === 'subadmin') {
+                roleText.textContent = "Paid/Unpaid Admin";
+                roleText.className = "text-emerald-400 font-bold";
+                roleIcon.className = "fa-solid fa-user-check text-emerald-400";
+                adminActionsGroup.classList.add('hidden');
+                actionsTh.classList.add('hidden');
+                actionsTdSub.classList.add('hidden');
+                adminViewerMetricsBadge.classList.remove('hidden');
             } else {
-                roleText.textContent = "Viewer Link (Locked)";
+                roleText.textContent = "Viewer (Locked)";
                 roleText.className = "text-sky-400 font-bold";
-                authBtn.querySelector('i').className = "fa-solid fa-eye text-sky-400";
+                roleIcon.className = "fa-solid fa-eye text-sky-400";
                 adminActionsGroup.classList.add('hidden');
                 actionsTh.classList.add('hidden');
                 actionsTdSub.classList.add('hidden');
@@ -539,14 +829,26 @@
                 const percentage = totalMembers > 0 ? Math.round((paidCount / totalMembers) * 100) : 0;
 
                 const card = document.createElement('div');
-                card.className = 'bg-[#0b0f19] p-4 rounded-xl border border-slate-800/80 shadow-lg flex flex-col justify-between hover:border-slate-700 transition';
+                card.className = 'bg-[#0b0f19] p-4 rounded-xl border border-slate-800/80 shadow-lg flex flex-col justify-between hover:border-slate-700 transition relative group';
+                
+                let adminListActions = '';
+                if (appState.role === 'mainadmin') {
+                    adminListActions = `
+                        <div class="absolute top-3 right-3 flex items-center gap-1.5 opacity-80 group-hover:opacity-100 transition">
+                            <button onclick="openEditListModal('${list.id}', '${list.name.replace(/'/g, "\\'")}', ${list.target || 5000})" title="Edit List" class="p-1 text-indigo-400 hover:text-indigo-300 bg-indigo-500/10 hover:bg-indigo-500/20 rounded transition"><i class="fa-solid fa-pen text-[10px]"></i></button>
+                            <button onclick="deleteList('${list.id}')" title="Move to Trash" class="p-1 text-red-400 hover:text-red-300 bg-red-500/10 hover:bg-red-500/20 rounded transition"><i class="fa-solid fa-trash-can text-[10px]"></i></button>
+                        </div>
+                    `;
+                }
+
                 card.innerHTML = `
+                    ${adminListActions}
                     <div>
-                        <div class="flex items-center justify-between mb-2">
+                        <div class="flex items-center justify-between mb-2 pr-12">
                             <span class="text-xs font-bold text-amber-400 uppercase tracking-wider">List #${idx + 1}</span>
                             <span class="text-[10px] px-2 py-0.5 rounded bg-slate-900 text-slate-300 border border-slate-800">Target: UGX ${(list.target || 5000).toLocaleString()}</span>
                         </div>
-                        <h4 class="text-sm font-bold text-white truncate" title="${list.name}">${list.name}</h4>
+                        <h4 class="text-sm font-bold text-white truncate pr-6" title="${list.name}">${list.name}</h4>
                         <div class="flex items-baseline justify-between mt-3">
                             <span class="text-xs text-slate-400">Total Collected:</span>
                             <span class="text-base font-black text-emerald-400">UGX ${totalPaid.toLocaleString()}</span>
@@ -599,17 +901,11 @@
                 return matchSearch && status === appState.filter;
             });
 
+            const isEditablePayment = (appState.role === 'mainadmin' || appState.role === 'subadmin');
+
             filtered.forEach((member, index) => {
                 const tr = document.createElement('tr');
                 tr.className = 'member-row';
-                
-                // Row selection on click/tap
-                tr.addEventListener('click', function(e) {
-                    if (e.target.closest('button')) return;
-                    document.querySelectorAll('tr.member-row').forEach(r => r.classList.remove('selected-row'));
-                    tr.classList.add('selected-row');
-                });
-
                 const statusObj = calculateMemberStatus(member);
                 let html = `
                     <td class="py-3 px-4 text-center sticky-col-1 border-r border-slate-800 bg-[#0b0f19] text-slate-400 text-xs">${index + 1}</td>
@@ -619,7 +915,7 @@
                 
                 appState.lists.forEach(list => {
                     const isPaid = member.payments && member.payments[list.id] === true;
-                    if (appState.isAdmin) {
+                    if (isEditablePayment) {
                         html += `
                             <td class="py-3 px-4 text-center border-r border-slate-800">
                                 <button onclick="togglePayment('${member.id}', '${list.id}', ${!isPaid})" 
@@ -649,7 +945,7 @@
                     }
                 });
 
-                if (appState.isAdmin) {
+                if (appState.role === 'mainadmin') {
                     html += `
                         <td class="py-3 px-4 text-center whitespace-nowrap no-print">
                             <div class="flex items-center justify-center space-x-3">
@@ -669,8 +965,288 @@
             });
         }
 
+        // REGISTERED USERS DIRECTORY (MAIN ADMIN SUB-PAGE)
+        function openRegUsersModal() {
+            if (appState.role !== 'mainadmin') return;
+            renderRegUsersList();
+            document.getElementById('modal-reg-users').classList.remove('hidden');
+        }
+
+        function closeRegUsersModal() {
+            document.getElementById('modal-reg-users').classList.add('hidden');
+        }
+
+        function renderRegUsersList() {
+            const container = document.getElementById('reg-users-container');
+            const searchVal = (document.getElementById('reg-users-search').value || '').toLowerCase();
+            container.innerHTML = '';
+
+            const filtered = appState.registeredUsers.filter(u => 
+                (u.fullName && u.fullName.toLowerCase().includes(searchVal)) ||
+                (u.phone && u.phone.includes(searchVal))
+            );
+
+            document.getElementById('reg-users-count').textContent = `Total Registered Users: ${filtered.length}`;
+
+            if (filtered.length === 0) {
+                container.innerHTML = `<p class="text-xs text-slate-400 text-center py-8">No registered users found.</p>`;
+                return;
+            }
+
+            filtered.forEach((usr, idx) => {
+                const div = document.createElement('div');
+                div.className = 'bg-[#07090e] p-3 rounded-xl border border-slate-800 flex items-center justify-between gap-3 hover:border-purple-500/40 transition';
+                div.innerHTML = `
+                    <div class="flex items-center gap-3">
+                        <span class="w-6 text-center text-xs text-slate-500 font-bold">${idx + 1}</span>
+                        <div>
+                            <h4 class="text-xs font-bold text-white">${usr.surname} ${usr.otherName}</h4>
+                            <p class="text-[11px] text-amber-400 font-medium"><i class="fa-solid fa-phone text-[9px]"></i> ${usr.phone}</p>
+                        </div>
+                    </div>
+                    <div class="text-right">
+                        <span class="text-[10px] text-slate-400 block">${usr.registeredAt || 'Active Session'}</span>
+                        <a href="tel:${usr.phone}" class="text-[10px] font-bold text-emerald-400 hover:underline">Call User</a>
+                    </div>
+                `;
+                container.appendChild(div);
+            });
+        }
+
+        function exportRegUsersCSV() {
+            let csv = ['#,Surname,Other Name,Full Phone Number,Registration Time'];
+            appState.registeredUsers.forEach((u, i) => {
+                csv.push(`${i+1},"${u.surname}","${u.otherName}","${u.phone}","${u.registeredAt || ''}"`);
+            });
+            const blob = new Blob([csv.join('\n')], { type: 'text/csv' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = 'Rich_Gang_Registered_Users.csv';
+            link.click();
+            showToast("Registered Users Directory Downloaded!");
+        }
+
+        // SHARE REPORT FORMAT
+        function buildShareReportText() {
+            const pageUrl = window.location.href.split('?')[0];
+            let txt = `🏆 RICH GANG GROUP REPORT 🏆\n`;
+            txt += `👥 Members: ${appState.members.length} | 📅 ${new Date().toLocaleDateString('en-GB')}\n`;
+            txt += `------------------------------------\n`;
+
+            appState.members.forEach((m, idx) => {
+                const status = calculateMemberStatus(m).status;
+                const icon = status === 'verified' ? '🟢' : status === 'pending' ? '🟡' : '🔴';
+                
+                let subDetails = [];
+                appState.lists.forEach(l => {
+                    const paid = m.payments && m.payments[l.id];
+                    subDetails.push(`${l.name.split(':')[0]}:${paid ? '✓' : '✗'}`);
+                });
+
+                txt += `${idx + 1}. ${icon} ${m.name} [${subDetails.join('|')}]\n`;
+            });
+
+            txt += `------------------------------------\n`;
+            txt += `🌐 Live Link: ${pageUrl}\n`;
+            txt += `📱 Designer: Luwagga Derick (+256768350920)`;
+
+            return txt;
+        }
+
+        async function shareGroupReport() {
+            const reportText = buildShareReportText();
+
+            if (navigator.share) {
+                try {
+                    await navigator.share({
+                        title: 'Rich Gang Member Welfare Report',
+                        text: reportText
+                    });
+                    showToast("Shared successfully!");
+                    return;
+                } catch (err) {
+                    if (err.name !== 'AbortError') {
+                        console.warn("Native share error:", err);
+                    } else {
+                        return;
+                    }
+                }
+            }
+
+            document.getElementById('share-text-area').value = reportText;
+            document.getElementById('modal-share-preview').classList.remove('hidden');
+        }
+
+        function closeShareModal() {
+            document.getElementById('modal-share-preview').classList.add('hidden');
+        }
+
+        function copyShareText() {
+            const textArea = document.getElementById('share-text-area');
+            textArea.select();
+            document.execCommand('copy');
+            showToast("Report text copied to clipboard!");
+            closeShareModal();
+        }
+
+        // TRASH BIN & LIST EDITING FUNCTIONS
+        function openTrashModal() {
+            if (appState.role !== 'mainadmin') return;
+            const container = document.getElementById('trash-list-container');
+            container.innerHTML = '';
+
+            if (appState.trashLists.length === 0) {
+                container.innerHTML = `<p class="text-xs text-slate-400 text-center py-6">Trash bin is empty.</p>`;
+            } else {
+                appState.trashLists.forEach(list => {
+                    const div = document.createElement('div');
+                    div.className = 'bg-[#07090e] p-3 rounded-xl border border-slate-800 flex items-center justify-between gap-3';
+                    div.innerHTML = `
+                        <div>
+                            <h4 class="text-xs font-bold text-white">${list.name}</h4>
+                            <span class="text-[10px] text-slate-400">Target: UGX ${(list.target || 5000).toLocaleString()}</span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <button onclick="restoreList('${list.id}')" class="px-2.5 py-1 text-[11px] font-semibold text-emerald-400 bg-emerald-500/10 hover:bg-emerald-500/20 rounded transition">Restore</button>
+                            <button onclick="permanentDeleteList('${list.id}')" class="px-2.5 py-1 text-[11px] font-semibold text-red-400 bg-red-500/10 hover:bg-red-500/20 rounded transition">Delete</button>
+                        </div>
+                    `;
+                    container.appendChild(div);
+                });
+            }
+            document.getElementById('modal-trash').classList.remove('hidden');
+        }
+
+        function closeTrashModal() {
+            document.getElementById('modal-trash').classList.add('hidden');
+        }
+
+        function deleteList(listId) {
+            if (appState.role !== 'mainadmin') return;
+            const listIdx = appState.lists.findIndex(l => l.id === listId);
+            if (listIdx !== -1) {
+                const removedList = appState.lists.splice(listIdx, 1)[0];
+                appState.trashLists.push(removedList);
+                syncToCloud();
+                showToast("List moved to trash bin");
+            }
+        }
+
+        function restoreList(listId) {
+            const listIdx = appState.trashLists.findIndex(l => l.id === listId);
+            if (listIdx !== -1) {
+                const restored = appState.trashLists.splice(listIdx, 1)[0];
+                appState.lists.push(restored);
+                syncToCloud();
+                openTrashModal();
+                showToast("List restored successfully");
+            }
+        }
+
+        function permanentDeleteList(listId) {
+            if (confirm("Permanently delete this list? This cannot be undone.")) {
+                appState.trashLists = appState.trashLists.filter(l => l.id !== listId);
+                syncToCloud();
+                openTrashModal();
+                showToast("List permanently deleted");
+            }
+        }
+
+        function openEditListModal(listId, name, target) {
+            if (appState.role !== 'mainadmin') return;
+            document.getElementById('edit-list-id').value = listId;
+            document.getElementById('edit-list-name-input').value = name;
+            document.getElementById('edit-list-target-input').value = target;
+            document.getElementById('modal-edit-list').classList.remove('hidden');
+        }
+
+        function closeEditListModal() {
+            document.getElementById('modal-edit-list').classList.add('hidden');
+        }
+
+        function saveEditedList() {
+            const listId = document.getElementById('edit-list-id').value;
+            const newName = document.getElementById('edit-list-name-input').value.trim();
+            const newTarget = parseInt(document.getElementById('edit-list-target-input').value) || 5000;
+
+            if (newName !== "") {
+                const list = appState.lists.find(l => l.id === listId);
+                if (list) {
+                    list.name = newName;
+                    list.target = newTarget;
+                    syncToCloud();
+                    closeEditListModal();
+                    showToast("List updated successfully");
+                }
+            } else {
+                alert("List title cannot be empty.");
+            }
+        }
+
+        // ADD MEMBER MODAL
+        function openAddMemberModal() {
+            if (appState.role !== 'mainadmin') return;
+            document.getElementById('new-member-name-input').value = '';
+            document.getElementById('modal-add-member').classList.remove('hidden');
+            document.getElementById('new-member-name-input').focus();
+        }
+
+        function closeAddMemberModal() {
+            document.getElementById('modal-add-member').classList.add('hidden');
+        }
+
+        function saveNewMember() {
+            const name = document.getElementById('new-member-name-input').value.trim();
+            if (name !== "") {
+                const newMember = {
+                    id: 'mem-' + Date.now(),
+                    name: name,
+                    payments: {}
+                };
+                appState.lists.forEach(l => { newMember.payments[l.id] = false; });
+                appState.members.push(newMember);
+                sortAlphabetically();
+                syncToCloud();
+                closeAddMemberModal();
+                showToast("New member added successfully");
+            } else {
+                alert("Please enter a valid member name.");
+            }
+        }
+
+        // ADD LIST MODAL
+        function openAddListModal() {
+            if (appState.role !== 'mainadmin') return;
+            document.getElementById('new-list-name-input').value = 'List ' + (appState.lists.length + appState.trashLists.length + 1) + ': ';
+            document.getElementById('new-list-target-input').value = '5000';
+            document.getElementById('modal-add-list').classList.remove('hidden');
+            document.getElementById('new-list-name-input').focus();
+        }
+
+        function closeAddListModal() {
+            document.getElementById('modal-add-list').classList.add('hidden');
+        }
+
+        function saveNewList() {
+            const name = document.getElementById('new-list-name-input').value.trim();
+            const target = parseInt(document.getElementById('new-list-target-input').value) || 5000;
+            if (name !== "") {
+                const newListId = 'list-' + Date.now();
+                appState.lists.push({ id: newListId, name: name, target: target });
+                appState.members.forEach(m => {
+                    if (!m.payments) m.payments = {};
+                    m.payments[newListId] = false;
+                });
+                syncToCloud();
+                closeAddListModal();
+                showToast("New contribution list added successfully");
+            } else {
+                alert("Please enter a valid list title.");
+            }
+        }
+
         function openEditModal(memberId, currentName) {
-            if (!appState.isAdmin) return;
+            if (appState.role !== 'mainadmin') return;
             document.getElementById('edit-member-id').value = memberId;
             document.getElementById('edit-member-name-input').value = currentName;
             document.getElementById('modal-edit-member').classList.remove('hidden');
@@ -688,6 +1264,7 @@
                 const member = appState.members.find(m => m.id === memberId);
                 if (member) {
                     member.name = newName;
+                    sortAlphabetically();
                     syncToCloud();
                     closeEditModal();
                     showToast("Member name updated successfully");
@@ -698,7 +1275,7 @@
         }
 
         function deleteMember(memberId) {
-            if (!appState.isAdmin) return;
+            if (appState.role !== 'mainadmin') return;
             if (confirm("Are you sure you want to remove this member?")) {
                 appState.members = appState.members.filter(m => m.id !== memberId);
                 syncToCloud();
@@ -729,7 +1306,7 @@
         }
 
         function togglePayment(memberId, listId, isChecked) {
-            if (!appState.isAdmin) return;
+            if (appState.role !== 'mainadmin' && appState.role !== 'subadmin') return;
             const member = appState.members.find(m => m.id === memberId);
             if (member) {
                 if (!member.payments) member.payments = {};
@@ -738,9 +1315,24 @@
             }
         }
 
+        // EXPORT UPDATED HTML FILE
+        function exportUpdatedHTML() {
+            const htmlContent = document.documentElement.outerHTML;
+            const blob = new Blob([htmlContent], { type: 'text/html' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'RichGang.html';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            showToast("Updated HTML file downloaded!");
+        }
+
         document.getElementById('auth-toggle-btn').addEventListener('click', () => {
-            if (appState.isAdmin) {
-                appState.isAdmin = false;
+            if (appState.role !== 'none') {
+                appState.role = 'none';
                 renderApp();
                 showToast('Switched to Viewer Mode');
             } else {
@@ -752,11 +1344,18 @@
 
         document.getElementById('form-admin-login').addEventListener('submit', (e) => {
             e.preventDefault();
-            if (document.getElementById('input-admin-password').value === '123') {
-                appState.isAdmin = true;
+            const enteredPass = document.getElementById('input-admin-password').value.trim();
+            
+            if (enteredPass === '123') {
+                appState.role = 'mainadmin';
                 document.getElementById('modal-admin-login').classList.add('hidden');
                 renderApp();
-                showToast('Admin access granted!');
+                showToast('Main Group Admin access granted!');
+            } else if (enteredPass.toLowerCase() === 'katoma') {
+                appState.role = 'subadmin';
+                document.getElementById('modal-admin-login').classList.add('hidden');
+                renderApp();
+                showToast('Paid/Unpaid Admin access granted!');
             } else {
                 document.getElementById('login-error-msg').classList.remove('hidden');
             }
@@ -820,41 +1419,3 @@
     </script>
 </body>
 </html>
-document.getElementById('add-list-btn').addEventListener('click', () => {
-    if (!appState.isAdmin) return;
-    const name = prompt("Enter new list/fund name (e.g., List 4: Medical Support):");
-    if (!name) return;
-    const targetStr = prompt("Enter target amount per member in UGX (default 5000):", "5000");
-    const target = parseInt(targetStr) || 5000;
-    
-    const newId = 'list-' + (appState.lists.length + 1);
-    appState.lists.push({ id: newId, name: name.trim(), target: target });
-    
-    // Initialize payment status for all existing members as false for this new list
-    appState.members.forEach(m => {
-        if (!m.payments) m.payments = {};
-        m.payments[newId] = false;
-    });
-
-    syncToCloud();
-    showToast("New list added successfully!");
-});
-
-document.getElementById('add-member-btn').addEventListener('click', () => {
-    if (!appState.isAdmin) return;
-    const name = prompt("Enter full name of the new member:");
-    if (!name || name.trim() === "") return;
-
-    const newId = 'mem-' + (appState.members.length + 1);
-    const payments = {};
-    appState.lists.forEach(l => { payments[l.id] = false; });
-
-    appState.members.push({
-        id: newId,
-        name: name.trim(),
-        payments: payments
-    });
-
-    syncToCloud();
-    showToast("New member added successfully!");
-});
