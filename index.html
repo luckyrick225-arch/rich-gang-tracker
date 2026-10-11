@@ -71,8 +71,8 @@
                     RG
                 </div>
                 <h2 class="text-2xl font-black text-white uppercase tracking-wider">Rich Gang Group</h2>
-                <p class="text-xs text-amber-400 font-bold tracking-widest uppercase">Member Welfare Portal Access</p>
-                <p class="text-[11px] text-slate-400">Please register or log in with your phone number to access the portal.</p>
+                <p id="auth-subtitle" class="text-xs text-amber-400 font-bold tracking-widest uppercase">Member Portal Access</p>
+                <p class="text-[11px] text-slate-400">Please register or log in with your phone number to proceed.</p>
             </div>
 
             <form id="form-user-register" onsubmit="handleUserRegistration(event)" class="space-y-4">
@@ -137,7 +137,7 @@
                     <div>
                         <h1 class="text-lg font-black tracking-tight text-white flex items-center gap-2">
                             Rich Gang Group
-                            <span class="text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-amber-500/10 text-amber-400 border border-amber-500/30">Member Welfare</span>
+                            <span id="header-badge-tag" class="text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-amber-500/10 text-amber-400 border border-amber-500/30">Member Portal</span>
                         </h1>
                         <p class="text-xs text-slate-400">
                             Designer: <span class="text-amber-400 font-semibold">Luwagga Derick</span> &bull; 
@@ -159,13 +159,13 @@
                     </div>
 
                     <div id="role-badge-container" class="mr-1">
-                        <button id="auth-toggle-btn" class="px-3 py-1.5 bg-slate-900 hover:bg-slate-800 text-slate-200 border border-slate-700 font-semibold rounded-lg text-xs flex items-center gap-2 transition shadow-sm">
+                        <span id="role-badge-display" class="px-3 py-1.5 bg-slate-900 text-slate-200 border border-slate-700 font-semibold rounded-lg text-xs flex items-center gap-2 shadow-sm">
                             <i id="role-icon" class="fa-solid fa-eye text-sky-400"></i> Mode: <span id="current-role-text" class="text-sky-400 font-bold">Viewer (Locked)</span>
-                        </button>
+                        </span>
                     </div>
 
                     <button id="share-btn" onclick="shareGroupReport()" class="px-3.5 py-1.5 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold rounded-lg text-xs flex items-center gap-2 transition shadow-md">
-                        <i class="fa-solid fa-share-nodes text-sm"></i> Share
+                        <i class="fa-solid fa-share-nodes text-sm"></i> Share Links
                     </button>
 
                     <a href="https://chat.whatsapp.com/JoSheTMGDhHD9zEWXEgSW4" target="_blank" rel="noopener noreferrer" class="px-3 py-1.5 bg-emerald-950/80 hover:bg-emerald-900 text-emerald-300 border border-emerald-700/50 font-semibold rounded-lg text-xs flex items-center gap-1.5 transition shadow-sm">
@@ -319,9 +319,7 @@
             <div class="p-4 border-b border-slate-800 bg-[#07090e]">
                 <input type="text" id="reg-users-search" oninput="renderRegUsersList()" placeholder="Filter users by name or phone..." class="w-full px-4 py-2 bg-slate-900 border border-slate-700 rounded-lg text-xs text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-purple-500">
             </div>
-            <div id="reg-users-container" class="p-4 flex-grow overflow-y-auto space-y-2">
-                <!-- Registered users dynamically rendered -->
-            </div>
+            <div id="reg-users-container" class="p-4 flex-grow overflow-y-auto space-y-2"></div>
             <div class="p-4 border-t border-slate-800 bg-[#04060a]/60 flex items-center justify-between">
                 <span id="reg-users-count" class="text-xs font-semibold text-slate-400">Total Registered Users: 0</span>
                 <div class="flex gap-2">
@@ -332,27 +330,41 @@
         </div>
     </div>
 
-    <!-- SHARE PREVIEW MODAL -->
+    <!-- SHARE LINKS MODAL (PROVIDES BOTH URLS) -->
     <div id="modal-share-preview" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-50 flex items-center justify-center hidden no-print">
         <div class="bg-[#0b0f19] rounded-2xl max-w-lg w-full mx-4 shadow-2xl border border-emerald-500/30 overflow-hidden flex flex-col max-h-[85vh]">
             <div class="bg-[#04060a] px-6 py-4 flex justify-between items-center text-white border-b border-slate-800">
                 <h3 class="font-bold text-base flex items-center gap-2">
                     <i class="fa-solid fa-share-nodes text-emerald-400"></i>
-                    Share Member Welfare Report
+                    Official Portal Links (View & Admin)
                 </h3>
                 <button onclick="closeShareModal()" class="text-slate-400 hover:text-white text-lg"><i class="fa-solid fa-xmark"></i></button>
             </div>
-            <div class="p-4 flex-grow overflow-y-auto">
-                <textarea id="share-text-area" readonly class="w-full h-64 p-3 bg-[#07090e] border border-slate-700 rounded-xl text-xs font-mono text-slate-200 focus:outline-none resize-none"></textarea>
-            </div>
-            <div class="p-4 border-t border-slate-800 bg-[#04060a]/60 flex items-center justify-between gap-3">
-                <span class="text-[11px] text-slate-400">Ready to share across WhatsApp, Imo, SMS</span>
-                <div class="flex gap-2">
-                    <button onclick="closeShareModal()" class="px-3.5 py-2 text-xs font-semibold text-slate-300 hover:bg-slate-800 rounded-lg transition">Close</button>
-                    <button onclick="copyShareText()" class="px-4 py-2 text-xs font-bold text-slate-950 bg-emerald-400 hover:bg-emerald-300 rounded-lg transition flex items-center gap-1.5 shadow-md">
-                        <i class="fa-solid fa-copy"></i> Copy Text
-                    </button>
+            <div class="p-6 space-y-4 overflow-y-auto">
+                <div>
+                    <label class="block text-xs font-bold text-sky-400 uppercase tracking-wider mb-1">Link 1: View Mode (For All Members)</label>
+                    <div class="flex gap-2">
+                        <input type="text" id="share-view-link" readonly class="w-full px-3 py-2 bg-[#07090e] border border-slate-700 rounded-lg text-xs text-slate-300">
+                        <button onclick="copyToClipboard('share-view-link')" class="px-3 py-2 bg-sky-600 hover:bg-sky-500 text-white rounded-lg text-xs font-bold"><i class="fa-solid fa-copy"></i></button>
+                    </div>
                 </div>
+                <div>
+                    <label class="block text-xs font-bold text-amber-400 uppercase tracking-wider mb-1">Link 2: Admin Mode (For Management Only)</label>
+                    <div class="flex gap-2">
+                        <input type="text" id="share-admin-link" readonly class="w-full px-3 py-2 bg-[#07090e] border border-slate-700 rounded-lg text-xs text-slate-300">
+                        <button onclick="copyToClipboard('share-admin-link')" class="px-3 py-2 bg-amber-500 hover:bg-amber-400 text-slate-950 rounded-lg text-xs font-bold"><i class="fa-solid fa-copy"></i></button>
+                    </div>
+                </div>
+                <div class="pt-2">
+                    <label class="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-1">WhatsApp Broadcast Template</label>
+                    <textarea id="share-text-area" readonly class="w-full h-32 p-3 bg-[#07090e] border border-slate-700 rounded-xl text-xs font-mono text-slate-200 focus:outline-none resize-none"></textarea>
+                </div>
+            </div>
+            <div class="p-4 border-t border-slate-800 bg-[#04060a]/60 flex items-center justify-between">
+                <span class="text-[11px] text-slate-400">Share directly with your group</span>
+                <button onclick="copyFullReportText()" class="px-4 py-2 text-xs font-bold text-slate-950 bg-emerald-400 hover:bg-emerald-300 rounded-lg transition flex items-center gap-1.5 shadow-md">
+                    <i class="fa-solid fa-copy"></i> Copy Broadcast Text
+                </button>
             </div>
         </div>
     </div>
@@ -376,7 +388,7 @@
 
     <!-- EDIT LIST MODAL -->
     <div id="modal-edit-list" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-50 flex items-center justify-center hidden no-print">
-        <div class="bg-[#0b0f19] rounded-2xl max-w-md w-full mx-4 shadow-2xl border border-amber-500/30 overflow-hidden transform transition-all">
+        <div class="bg-[#0b0f19] rounded-2xl max-w-md w-full mx-4 shadow-2xl border border-amber-500/30 overflow-hidden">
             <div class="bg-[#04060a] px-6 py-4 flex justify-between items-center text-white border-b border-slate-800">
                 <h3 class="font-bold text-base flex items-center gap-2">
                     <i class="fa-solid fa-pen-to-square text-amber-400"></i>
@@ -396,9 +408,7 @@
                 </div>
                 <div class="pt-2 flex justify-end gap-3">
                     <button type="button" onclick="closeEditListModal()" class="px-4 py-2.5 text-xs font-semibold text-slate-300 hover:bg-slate-800 rounded-xl transition">Cancel</button>
-                    <button type="button" onclick="saveEditedList()" class="px-5 py-2.5 text-xs font-bold text-slate-950 bg-amber-500 hover:bg-amber-400 rounded-xl transition shadow-md shadow-amber-500/20">
-                        Save Changes
-                    </button>
+                    <button type="button" onclick="saveEditedList()" class="px-5 py-2.5 text-xs font-bold text-slate-950 bg-amber-500 hover:bg-amber-400 rounded-xl transition shadow-md">Save Changes</button>
                 </div>
             </div>
         </div>
@@ -406,7 +416,7 @@
 
     <!-- ADD MEMBER MODAL -->
     <div id="modal-add-member" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-50 flex items-center justify-center hidden no-print">
-        <div class="bg-[#0b0f19] rounded-2xl max-w-md w-full mx-4 shadow-2xl border border-indigo-500/30 overflow-hidden transform transition-all">
+        <div class="bg-[#0b0f19] rounded-2xl max-w-md w-full mx-4 shadow-2xl border border-indigo-500/30 overflow-hidden">
             <div class="bg-[#04060a] px-6 py-4 flex justify-between items-center text-white border-b border-slate-800">
                 <h3 class="font-bold text-base flex items-center gap-2">
                     <i class="fa-solid fa-user-plus text-indigo-400"></i>
@@ -421,9 +431,7 @@
                 </div>
                 <div class="pt-2 flex justify-end gap-3">
                     <button type="button" onclick="closeAddMemberModal()" class="px-4 py-2.5 text-xs font-semibold text-slate-300 hover:bg-slate-800 rounded-xl transition">Cancel</button>
-                    <button type="button" onclick="saveNewMember()" class="px-5 py-2.5 text-xs font-bold text-white bg-indigo-600 hover:bg-indigo-500 rounded-xl transition shadow-md">
-                        Add Member
-                    </button>
+                    <button type="button" onclick="saveNewMember()" class="px-5 py-2.5 text-xs font-bold text-white bg-indigo-600 hover:bg-indigo-500 rounded-xl transition shadow-md">Add Member</button>
                 </div>
             </div>
         </div>
@@ -431,7 +439,7 @@
 
     <!-- ADD LIST MODAL -->
     <div id="modal-add-list" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-50 flex items-center justify-center hidden no-print">
-        <div class="bg-[#0b0f19] rounded-2xl max-w-md w-full mx-4 shadow-2xl border border-amber-500/30 overflow-hidden transform transition-all">
+        <div class="bg-[#0b0f19] rounded-2xl max-w-md w-full mx-4 shadow-2xl border border-amber-500/30 overflow-hidden">
             <div class="bg-[#04060a] px-6 py-4 flex justify-between items-center text-white border-b border-slate-800">
                 <h3 class="font-bold text-base flex items-center gap-2">
                     <i class="fa-solid fa-list-check text-amber-400"></i>
@@ -450,9 +458,7 @@
                 </div>
                 <div class="pt-2 flex justify-end gap-3">
                     <button type="button" onclick="closeAddListModal()" class="px-4 py-2.5 text-xs font-semibold text-slate-300 hover:bg-slate-800 rounded-xl transition">Cancel</button>
-                    <button type="button" onclick="saveNewList()" class="px-5 py-2.5 text-xs font-bold text-slate-950 bg-amber-500 hover:bg-amber-400 rounded-xl transition shadow-md">
-                        Create List
-                    </button>
+                    <button type="button" onclick="saveNewList()" class="px-5 py-2.5 text-xs font-bold text-slate-950 bg-amber-500 hover:bg-amber-400 rounded-xl transition shadow-md">Create List</button>
                 </div>
             </div>
         </div>
@@ -460,7 +466,7 @@
 
     <!-- EDIT MEMBER MODAL -->
     <div id="modal-edit-member" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-50 flex items-center justify-center hidden no-print">
-        <div class="bg-[#0b0f19] rounded-2xl max-w-md w-full mx-4 shadow-2xl border border-amber-500/30 overflow-hidden transform transition-all">
+        <div class="bg-[#0b0f19] rounded-2xl max-w-md w-full mx-4 shadow-2xl border border-amber-500/30 overflow-hidden">
             <div class="bg-[#04060a] px-6 py-4 flex justify-between items-center text-white border-b border-slate-800">
                 <h3 class="font-bold text-base flex items-center gap-2">
                     <i class="fa-solid fa-pen-to-square text-amber-400"></i>
@@ -476,9 +482,7 @@
                 </div>
                 <div class="pt-2 flex justify-end gap-3">
                     <button type="button" onclick="closeEditModal()" class="px-4 py-2.5 text-xs font-semibold text-slate-300 hover:bg-slate-800 rounded-xl transition">Cancel</button>
-                    <button type="button" onclick="saveEditedMemberName()" class="px-5 py-2.5 text-xs font-bold text-slate-950 bg-amber-500 hover:bg-amber-400 rounded-xl transition shadow-md">
-                        Save Changes
-                    </button>
+                    <button type="button" onclick="saveEditedMemberName()" class="px-5 py-2.5 text-xs font-bold text-slate-950 bg-amber-500 hover:bg-amber-400 rounded-xl transition shadow-md">Save Changes</button>
                 </div>
             </div>
         </div>
@@ -489,16 +493,16 @@
         <div class="bg-[#0b0f19] rounded-2xl max-w-sm w-full mx-4 shadow-2xl border border-slate-800 overflow-hidden">
             <div class="bg-[#04060a] px-6 py-4 flex justify-between items-center text-white border-b border-slate-800">
                 <h3 class="font-bold text-base flex items-center gap-2"><i class="fa-solid fa-lock text-amber-400"></i> Admin Authentication</h3>
-                <button class="close-modal text-slate-400 hover:text-white text-lg"><i class="fa-solid fa-xmark"></i></button>
+                <button class="close-admin-modal text-slate-400 hover:text-white text-lg"><i class="fa-solid fa-xmark"></i></button>
             </div>
             <form id="form-admin-login" class="p-6 space-y-4">
                 <div>
-                    <label class="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-1.5">Enter Password *</label>
+                    <label class="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-1.5">Enter Admin Password *</label>
                     <input type="password" id="input-admin-password" placeholder="Enter password" required class="w-full px-3.5 py-2.5 bg-[#07090e] border border-slate-700 rounded-lg text-sm text-slate-100 focus:outline-none focus:ring-2 focus:ring-amber-500">
-                    <p id="login-error-msg" class="text-xs text-red-400 mt-1.5 hidden">Incorrect password. Please try again.</p>
+                    <p id="login-error-msg" class="text-xs text-red-400 mt-1.5 hidden">Incorrect password. Try '123' or 'katoma'.</p>
                 </div>
                 <div class="pt-2 flex justify-end gap-3">
-                    <button type="button" class="close-modal px-4 py-2 text-sm text-slate-300">Cancel</button>
+                    <button type="button" class="close-admin-modal px-4 py-2 text-sm text-slate-300">Cancel</button>
                     <button type="submit" class="px-5 py-2 text-sm font-bold text-slate-950 bg-amber-500 hover:bg-amber-400 rounded-lg shadow-md transition">Login</button>
                 </div>
             </form>
@@ -629,10 +633,15 @@
         async function initData() {
             checkPersistentSession();
 
+            // Detect Mode from URL Query Parameter (?mode=admin or ?mode=view)
             const urlParams = new URLSearchParams(window.location.search);
-            const roleParam = urlParams.get('role');
-            if (roleParam === 'main') appState.role = 'mainadmin';
-            else if (roleParam === 'katoma') appState.role = 'subadmin';
+            const modeParam = urlParams.get('mode');
+
+            if (modeParam === 'admin') {
+                appState.role = 'mainadmin';
+            } else {
+                appState.role = 'none'; // Default to View mode for all regular members
+            }
 
             await loadCloudData(false);
             sortAlphabetically();
@@ -643,7 +652,7 @@
                 syncToCloud();
             }
 
-            // Auto-refresh from online cloud every 8 seconds so other devices see updates live
+            // Auto-refresh from cloud every 8 seconds
             setInterval(() => {
                 loadCloudData(true);
             }, 8000);
@@ -783,6 +792,7 @@
             const actionsTdSub = document.getElementById('td-actions-subtotal');
             const adminViewerMetricsBadge = document.getElementById('admin-viewer-metrics-badge');
             const trashBadge = document.getElementById('trash-badge');
+            const badgeTag = document.getElementById('header-badge-tag');
 
             if (appState.trashLists.length > 0) {
                 trashBadge.textContent = appState.trashLists.length;
@@ -792,25 +802,31 @@
             }
 
             if (appState.role === 'mainadmin') {
-                roleText.textContent = "Main Group Admin";
+                roleText.textContent = "Admin Mode";
                 roleText.className = "text-amber-400 font-bold";
                 roleIcon.className = "fa-solid fa-crown text-amber-400";
+                badgeTag.textContent = "Admin Portal";
+                badgeTag.className = "text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-amber-500/10 text-amber-400 border border-amber-500/30";
                 adminActionsGroup.classList.remove('hidden');
                 actionsTh.classList.remove('hidden');
                 actionsTdSub.classList.remove('hidden');
                 adminViewerMetricsBadge.classList.remove('hidden');
             } else if (appState.role === 'subadmin') {
-                roleText.textContent = "Paid/Unpaid Admin";
+                roleText.textContent = "Treasurer Mode";
                 roleText.className = "text-emerald-400 font-bold";
                 roleIcon.className = "fa-solid fa-user-check text-emerald-400";
+                badgeTag.textContent = "Treasurer Portal";
+                badgeTag.className = "text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/30";
                 adminActionsGroup.classList.add('hidden');
-                actionsTh.classList.add('hidden');
-                actionsTdSub.classList.add('hidden');
+                actionsTh.classList.remove('hidden'); // allow checking/unchecking payments
+                actionsTdSub.classList.remove('hidden');
                 adminViewerMetricsBadge.classList.remove('hidden');
             } else {
-                roleText.textContent = "Viewer (Locked)";
+                roleText.textContent = "Member View (Live)";
                 roleText.className = "text-sky-400 font-bold";
                 roleIcon.className = "fa-solid fa-eye text-sky-400";
+                badgeTag.textContent = "Member View";
+                badgeTag.className = "text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-sky-500/10 text-sky-400 border border-sky-500/30";
                 adminActionsGroup.classList.add('hidden');
                 actionsTh.classList.add('hidden');
                 actionsTdSub.classList.add('hidden');
@@ -964,7 +980,6 @@
             });
         }
 
-        // REGISTERED USERS DIRECTORY (MAIN ADMIN SUB-PAGE)
         function openRegUsersModal() {
             if (appState.role !== 'mainadmin') return;
             renderRegUsersList();
@@ -1025,54 +1040,24 @@
             showToast("Registered Users Directory Downloaded!");
         }
 
-        // SHARE REPORT FORMAT
-        function buildShareReportText() {
-            const pageUrl = window.location.href.split('?')[0];
+        // SHARE LINKS MODAL (TWO SEPARATE LINKS)
+        function shareGroupReport() {
+            const baseUrl = window.location.href.split('?')[0];
+            const viewLink = baseUrl; // Link 1 (Viewer mode)
+            const adminLink = baseUrl + '?mode=admin'; // Link 2 (Admin mode)
+
+            document.getElementById('share-view-link').value = viewLink;
+            document.getElementById('share-admin-link').value = adminLink;
+
             let txt = `🏆 RICH GANG GROUP REPORT 🏆\n`;
             txt += `👥 Members: ${appState.members.length} | 📅 ${new Date().toLocaleDateString('en-GB')}\n`;
             txt += `------------------------------------\n`;
-
-            appState.members.forEach((m, idx) => {
-                const status = calculateMemberStatus(m).status;
-                const icon = status === 'verified' ? '🟢' : status === 'pending' ? '🟡' : '🔴';
-                
-                let subDetails = [];
-                appState.lists.forEach(l => {
-                    const paid = m.payments && m.payments[l.id];
-                    subDetails.push(`${l.name.split(':')[0]}:${paid ? '✓' : '✗'}`);
-                });
-
-                txt += `${idx + 1}. ${icon} ${m.name} [${subDetails.join('|')}]\n`;
-            });
-
+            txt += `👁️ View Link (Members):\n${viewLink}\n\n`;
+            txt += `🔐 Admin Link (Management):\n${adminLink}\n`;
             txt += `------------------------------------\n`;
-            txt += `🌐 Live Link: ${pageUrl}\n`;
             txt += `📱 Designer: Luwagga Derick (+256768350920)`;
 
-            return txt;
-        }
-
-        async function shareGroupReport() {
-            const reportText = buildShareReportText();
-
-            if (navigator.share) {
-                try {
-                    await navigator.share({
-                        title: 'Rich Gang Member Welfare Report',
-                        text: reportText
-                    });
-                    showToast("Shared successfully!");
-                    return;
-                } catch (err) {
-                    if (err.name !== 'AbortError') {
-                        console.warn("Native share error:", err);
-                    } else {
-                        return;
-                    }
-                }
-            }
-
-            document.getElementById('share-text-area').value = reportText;
+            document.getElementById('share-text-area').value = txt;
             document.getElementById('modal-share-preview').classList.remove('hidden');
         }
 
@@ -1080,15 +1065,21 @@
             document.getElementById('modal-share-preview').classList.add('hidden');
         }
 
-        function copyShareText() {
+        function copyToClipboard(elementId) {
+            const input = document.getElementById(elementId);
+            input.select();
+            document.execCommand('copy');
+            showToast("Link copied to clipboard!");
+        }
+
+        function copyFullReportText() {
             const textArea = document.getElementById('share-text-area');
             textArea.select();
             document.execCommand('copy');
-            showToast("Report text copied to clipboard!");
+            showToast("Full broadcast text copied!");
             closeShareModal();
         }
 
-        // TRASH BIN & LIST EDITING FUNCTIONS
         function openTrashModal() {
             if (appState.role !== 'mainadmin') return;
             const container = document.getElementById('trash-list-container');
@@ -1182,7 +1173,6 @@
             }
         }
 
-        // ADD MEMBER MODAL
         function openAddMemberModal() {
             if (appState.role !== 'mainadmin') return;
             document.getElementById('new-member-name-input').value = '';
@@ -1213,7 +1203,6 @@
             }
         }
 
-        // ADD LIST MODAL
         function openAddListModal() {
             if (appState.role !== 'mainadmin') return;
             document.getElementById('new-list-name-input').value = 'List ' + (appState.lists.length + appState.trashLists.length + 1) + ': ';
@@ -1314,7 +1303,6 @@
             }
         }
 
-        // EXPORT UPDATED HTML FILE
         function exportUpdatedHTML() {
             const htmlContent = document.documentElement.outerHTML;
             const blob = new Blob([htmlContent], { type: 'text/html' });
@@ -1329,12 +1317,9 @@
             showToast("Updated HTML file downloaded!");
         }
 
-        document.getElementById('auth-toggle-btn').addEventListener('click', () => {
-            if (appState.role !== 'none') {
-                appState.role = 'none';
-                renderApp();
-                showToast('Switched to Viewer Mode');
-            } else {
+        // Clicking role badge allows logging into Admin if currently in viewer mode
+        document.getElementById('role-badge-display').addEventListener('click', () => {
+            if (appState.role === 'none') {
                 document.getElementById('input-admin-password').value = '';
                 document.getElementById('login-error-msg').classList.add('hidden');
                 document.getElementById('modal-admin-login').classList.remove('hidden');
@@ -1349,18 +1334,18 @@
                 appState.role = 'mainadmin';
                 document.getElementById('modal-admin-login').classList.add('hidden');
                 renderApp();
-                showToast('Main Group Admin access granted!');
+                showToast('Admin Mode unlocked!');
             } else if (enteredPass.toLowerCase() === 'katoma') {
                 appState.role = 'subadmin';
                 document.getElementById('modal-admin-login').classList.add('hidden');
                 renderApp();
-                showToast('Paid/Unpaid Admin access granted!');
+                showToast('Treasurer Mode unlocked!');
             } else {
                 document.getElementById('login-error-msg').classList.remove('hidden');
             }
         });
 
-        document.querySelectorAll('.close-modal').forEach(btn => {
+        document.querySelectorAll('.close-admin-modal').forEach(btn => {
             btn.addEventListener('click', () => document.getElementById('modal-admin-login').classList.add('hidden'));
         });
 
