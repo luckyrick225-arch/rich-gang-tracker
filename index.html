@@ -192,7 +192,7 @@
                     </div>
 
                     <button id="refresh-data-btn" onclick="manualRefresh()" title="Reset / Reload Local Cache" class="px-3 py-1.5 bg-slate-900 hover:bg-slate-800 text-slate-300 rounded-lg text-xs flex items-center gap-1.5 border border-slate-700/80 transition">
-                        <i id="refresh-icon" class="fa-solid fa-rotate text-sky-400"></i> Reload
+                        <i id="refresh-icon" class="fa-solid fa-rotate text-sky-400"></i> Reset Defaults
                     </button>
 
                     <div class="h-5 w-px bg-slate-800 mx-1 hidden sm:block"></div>
@@ -1244,22 +1244,10 @@
             }
         }
 
-        // REBUILD & REWRITE PROGRAMME CODE INTO BASE HTML
         function rewriteAndDownloadHTML() {
             if (appState.role !== 'mainadmin') return;
-
-            // We serialize the current live application state arrays directly into the initial constants in the generated code
-            let html = document.documentElement.outerHTML;
-
-            // Replace initial defaults in script with current live state for persistent compilation
-            const listsScriptReplacement = `const INITIAL_LISTS = ${JSON.stringify(appState.lists, null, 4)};`;
-            html = html.replace(/const INITIAL_LISTS = \[[\s\S]*?\];/, listsScriptReplacement);
-
-            const membersArray = appState.members.map(m => ({ name: m.name, payments: m.payments }));
-            const membersScriptReplacement = `const CURRENT_MEMBERS_STATE = ${JSON.stringify(membersArray, null, 4)};`;
-            
-            // Inject members state if not already present, or replace
-            const blob = new Blob([html], { type: 'text/html' });
+            const htmlContent = document.documentElement.outerHTML;
+            const blob = new Blob([htmlContent], { type: 'text/html' });
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
