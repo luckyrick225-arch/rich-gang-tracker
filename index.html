@@ -820,3 +820,41 @@
     </script>
 </body>
 </html>
+document.getElementById('add-list-btn').addEventListener('click', () => {
+    if (!appState.isAdmin) return;
+    const name = prompt("Enter new list/fund name (e.g., List 4: Medical Support):");
+    if (!name) return;
+    const targetStr = prompt("Enter target amount per member in UGX (default 5000):", "5000");
+    const target = parseInt(targetStr) || 5000;
+    
+    const newId = 'list-' + (appState.lists.length + 1);
+    appState.lists.push({ id: newId, name: name.trim(), target: target });
+    
+    // Initialize payment status for all existing members as false for this new list
+    appState.members.forEach(m => {
+        if (!m.payments) m.payments = {};
+        m.payments[newId] = false;
+    });
+
+    syncToCloud();
+    showToast("New list added successfully!");
+});
+
+document.getElementById('add-member-btn').addEventListener('click', () => {
+    if (!appState.isAdmin) return;
+    const name = prompt("Enter full name of the new member:");
+    if (!name || name.trim() === "") return;
+
+    const newId = 'mem-' + (appState.members.length + 1);
+    const payments = {};
+    appState.lists.forEach(l => { payments[l.id] = false; });
+
+    appState.members.push({
+        id: newId,
+        name: name.trim(),
+        payments: payments
+    });
+
+    syncToCloud();
+    showToast("New member added successfully!");
+});
