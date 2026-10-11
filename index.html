@@ -64,7 +64,7 @@
 <body class="bg-[#07090e] text-slate-100 min-h-screen flex flex-col antialiased selection:bg-amber-500 selection:text-slate-950">
 
     <!-- MANDATORY USER REGISTRATION / LOGIN OVERLAY -->
-    <div id="modal-user-auth" class="fixed inset-0 bg-[#04060a] z-50 flex items-center justify-center p-4 select-none no-print">
+    <div id="modal-user-auth" class="fixed inset-0 bg-[#04060a] z-50 flex items-center justify-center p-4 select-none no-print hidden">
         <div class="bg-[#0b0f19] rounded-2xl max-w-md w-full p-6 shadow-2xl border border-amber-500/30 space-y-5">
             <div class="text-center space-y-2">
                 <div class="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-gradient-to-tr from-amber-500 to-yellow-300 text-slate-950 font-black text-2xl shadow-lg border border-amber-300">
@@ -150,7 +150,7 @@
                     <div id="user-profile-badge" class="px-3 py-1.5 bg-slate-900 border border-slate-700 rounded-lg text-xs flex items-center gap-2 text-slate-300">
                         <i class="fa-solid fa-user-circle text-amber-400 text-sm"></i>
                         <span id="active-user-name" class="font-bold text-white">User</span>
-                        <button onclick="logoutUser()" title="Logout from device" class="ml-1 text-red-400 hover:text-red-300 font-semibold underline text-[11px]"><i class="fa-solid fa-right-from-bracket"></i> Logout</button>
+                        <button onclick="logoutUser()" title="Logout from session" class="ml-1 text-red-400 hover:text-red-300 font-semibold underline text-[11px]"><i class="fa-solid fa-right-from-bracket"></i> Logout</button>
                     </div>
 
                     <div id="admin-viewer-metrics-badge" class="hidden px-3 py-1.5 bg-slate-900 border border-amber-500/30 rounded-lg text-xs flex items-center gap-2">
@@ -566,25 +566,15 @@
             appState.members.sort((a, b) => a.name.localeCompare(b.name, undefined, { sensitivity: 'accent' }));
         }
 
-        function saveToLocalStorage() {
-            const stateData = {
-                lists: appState.lists,
-                trashLists: appState.trashLists,
-                members: appState.members,
-                registeredUsers: appState.registeredUsers
-            };
-            localStorage.setItem('richgang_saved_state', JSON.stringify(stateData));
-        }
-
         function checkPersistentSession() {
-            const savedUser = localStorage.getItem('richgang_active_user');
+            const savedUser = sessionStorage.getItem('richgang_active_user');
             if (savedUser) {
                 try {
                     appState.currentUser = JSON.parse(savedUser);
                     document.getElementById('modal-user-auth').classList.add('hidden');
                     document.getElementById('active-user-name').textContent = appState.currentUser.surname + " " + appState.currentUser.otherName;
                 } catch(e) {
-                    localStorage.removeItem('richgang_active_user');
+                    sessionStorage.removeItem('richgang_active_user');
                 }
             } else {
                 document.getElementById('modal-user-auth').classList.remove('hidden');
@@ -613,7 +603,7 @@
             };
 
             appState.currentUser = userObj;
-            localStorage.setItem('richgang_active_user', JSON.stringify(userObj));
+            sessionStorage.setItem('richgang_active_user', JSON.stringify(userObj));
             
             const existingIndex = appState.registeredUsers.findIndex(u => u.phone === userObj.phone);
             if (existingIndex !== -1) {
@@ -629,8 +619,8 @@
         }
 
         function logoutUser() {
-            if (confirm("Are you sure you want to logout from this device? You will need to register/login again.")) {
-                localStorage.removeItem('richgang_active_user');
+            if (confirm("Are you sure you want to logout?")) {
+                sessionStorage.removeItem('richgang_active_user');
                 appState.currentUser = null;
                 document.getElementById('modal-user-auth').classList.remove('hidden');
             }
@@ -653,53 +643,34 @@
                 syncToCloud();
             }
 
+            // Auto-refresh from online cloud every 8 seconds so other devices see updates live
             setInterval(() => {
                 loadCloudData(true);
-            }, 10000);
+            }, 8000);
         }
 
         async function loadCloudData(isBackground = false) {
-            // 1. Load local state first for instant rendering
-            const localData = localStorage.getItem('richgang_saved_state');
-            if (localData) {
-                try {
-                    const parsed = JSON.parse(localData);
-                    if (parsed.lists && parsed.lists.length > 0) {
-                        appState.lists = parsed.lists;
-                        appState.trashLists = parsed.trashLists || [];
-                        appState.registeredUsers = parsed.registeredUsers || [];
-                        appState.members = parsed.members || [];
-                        sortAlphabetically();
-                        renderApp();
-                    }
-                } catch(e) {
-                    console.warn("Local storage parse error", e);
-                }
-            }
-
-            // 2. Fetch latest data from Google Sheet cloud
             if (API_URL) {
                 try {
                     const response = await fetch(API_URL);
                     const data = await response.json();
                     if (data && data.lists && data.members && data.lists.length > 0) {
                         appState.lists = data.lists;
-                        if (data.trashLists) appState.trashLists = data.trashLists;
-                        if (data.registeredUsers) appState.registeredUsers = data.registeredUsers;
+                        appState.trashLists = data.trashLists || [];
+                        appState.registeredUsers = data.registeredUsers || [];
                         appState.members = data.members;
                         
                         if (appState.currentUser && !appState.registeredUsers.some(u => u.phone === appState.currentUser.phone)) {
                             appState.registeredUsers.push(appState.currentUser);
                         }
 
-                        saveToLocalStorage();
                         sortAlphabetically();
                         renderApp();
-                        if (!isBackground) showToast("Synced with cloud successfully!");
+                        if (!isBackground) showToast("Synced live from cloud!");
                         return;
                     }
                 } catch (e) {
-                    console.warn("Cloud load offline, using local cache", e);
+                    console.warn("Cloud load failed", e);
                 }
             }
             if (!appState.lists.length) {
@@ -750,7 +721,6 @@
 
         async function syncToCloud() {
             sortAlphabetically();
-            saveToLocalStorage(); // Instant local save
             renderApp();
 
             if (API_URL) {
@@ -766,7 +736,7 @@
                             registeredUsers: appState.registeredUsers 
                         })
                     });
-                    showToast("Synced live to cloud Google Sheet!");
+                    showToast("Changes pushed to cloud Google Sheet!");
                 } catch (e) {
                     console.error("Cloud sync error:", e);
                 }
