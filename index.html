@@ -512,7 +512,7 @@
     </div>
 
     <script>
-        const API_URL = "https://script.google.com/macros/s/AKfycbzyaX-MiNPei3tfEpbnAmFX2fhKEdygFRy7l50FImltiXyFjCveUHj0gQUSZehcZtuRBg/exec";
+        const API_URL = "https://script.google.com/macros/s/AKfycbwcbP6Xv6MpXhVdwHPuTF9n00TudbMYU1gJ98Ybt0RFoHMKfSEo6D7TnkoOl3ZCK7tjsQ/exec";
 
         const PRELOADED_LISTS = [
             { id: "list-1", name: "List 1: Mukyaala Nabwanika Maria", target: 5000 },
@@ -566,6 +566,16 @@
             appState.members.sort((a, b) => a.name.localeCompare(b.name, undefined, { sensitivity: 'accent' }));
         }
 
+        function saveToLocalStorage() {
+            const stateData = {
+                lists: appState.lists,
+                trashLists: appState.trashLists,
+                members: appState.members,
+                registeredUsers: appState.registeredUsers
+            };
+            localStorage.setItem('richgang_saved_state', JSON.stringify(stateData));
+        }
+
         function checkPersistentSession() {
             const savedUser = localStorage.getItem('richgang_active_user');
             if (savedUser) {
@@ -605,7 +615,6 @@
             appState.currentUser = userObj;
             localStorage.setItem('richgang_active_user', JSON.stringify(userObj));
             
-            // Add or update user entry in system list and sync immediately
             const existingIndex = appState.registeredUsers.findIndex(u => u.phone === userObj.phone);
             if (existingIndex !== -1) {
                 appState.registeredUsers[existingIndex] = userObj;
@@ -639,7 +648,6 @@
             sortAlphabetically();
             renderApp();
 
-            // Ensure current active user is registered in pool
             if (appState.currentUser && !appState.registeredUsers.some(u => u.phone === appState.currentUser.phone)) {
                 appState.registeredUsers.push(appState.currentUser);
                 syncToCloud();
@@ -651,6 +659,25 @@
         }
 
         async function loadCloudData(isBackground = false) {
+            // 1. Load local state first for instant rendering
+            const localData = localStorage.getItem('richgang_saved_state');
+            if (localData) {
+                try {
+                    const parsed = JSON.parse(localData);
+                    if (parsed.lists && parsed.lists.length > 0) {
+                        appState.lists = parsed.lists;
+                        appState.trashLists = parsed.trashLists || [];
+                        appState.registeredUsers = parsed.registeredUsers || [];
+                        appState.members = parsed.members || [];
+                        sortAlphabetically();
+                        renderApp();
+                    }
+                } catch(e) {
+                    console.warn("Local storage parse error", e);
+                }
+            }
+
+            // 2. Fetch latest data from Google Sheet cloud
             if (API_URL) {
                 try {
                     const response = await fetch(API_URL);
@@ -661,18 +688,18 @@
                         if (data.registeredUsers) appState.registeredUsers = data.registeredUsers;
                         appState.members = data.members;
                         
-                        // Merge local user if not present in cloud payload
                         if (appState.currentUser && !appState.registeredUsers.some(u => u.phone === appState.currentUser.phone)) {
                             appState.registeredUsers.push(appState.currentUser);
                         }
 
+                        saveToLocalStorage();
                         sortAlphabetically();
                         renderApp();
-                        if (!isBackground) showToast("Data synchronized successfully!");
+                        if (!isBackground) showToast("Synced with cloud successfully!");
                         return;
                     }
                 } catch (e) {
-                    console.warn("Cloud load failed, using local state", e);
+                    console.warn("Cloud load offline, using local cache", e);
                 }
             }
             if (!appState.lists.length) {
@@ -723,7 +750,9 @@
 
         async function syncToCloud() {
             sortAlphabetically();
+            saveToLocalStorage(); // Instant local save
             renderApp();
+
             if (API_URL) {
                 try {
                     await fetch(API_URL, {
