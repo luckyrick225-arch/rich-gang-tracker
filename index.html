@@ -165,6 +165,7 @@
                         <p class="text-xs text-slate-400">Designer: <span class="text-amber-400 font-semibold">Luwagga Derick</span> • <a href="tel:+256768350920" class="text-emerald-400 underline">+256768350920</a></p>
                     </div>
                 </div>
+                <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
                 <!-- Member Actions & Role Switcher -->
                 <div class="flex flex-wrap items-center gap-1.5">
@@ -4636,7 +4637,38 @@
         function escapeHtml(str) {
             return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
         }
+        
+// Initialize Supabase Client
+const SUPABASE_URL = 'https://sphrgkrajhphgppennoz.supabase.co';
+const SUPABASE_ANON_KEY = 'sb_publishable_Mt9-vnMXeo_4E3PUwW2NPw_SnY6uIsS';
 
+const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        
+        async function loadData() {
+    const { data, error } = await supabase
+        .from('your_table_name')
+        .select('*');
+
+    if (error) {
+        console.error('Error loading data:', error);
+    } else {
+        console.log('Live Data from Supabase:', data);
+        // Update your webpage UI with this data here
+    }
+            }
+        
+        async function addRecord(memberName, amount) {
+    const { data, error } = await supabase
+        .from('your_table_name')
+        .insert([{ name: memberName, contribution: amount }]);
+
+    if (error) {
+        console.error('Error saving data:', error);
+    } else {
+        console.log('Successfully saved to cloud!', data);
+    }
+            }
+        
         window.onload = initData;
     </script>
 
