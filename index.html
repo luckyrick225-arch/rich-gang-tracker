@@ -48,7 +48,7 @@
         /* Splash Screen Fade-in Animation */
         @keyframes fadeZoomIn {
             0% { opacity: 0; transform: scale(0.9); }
-            50% { opacity: 1; transform: scale(2.02); }
+            50% { opacity: 1; transform: scale(0.09); }
             100% { opacity: 1; transform: scale(1); }
         }
         .splash-fade-anim {
@@ -57,11 +57,11 @@
 
         /* Lock Page Fade-In Animation */
         @keyframes fadeInLock {
-            from { opacity: 0; transform: scale(0.05); }
+            from { opacity: 0; transform: scale(1); }
             to { opacity: 1; transform: scale(1); }
         }
         .lock-fade-anim {
-            animation: fadeInLock 0.5s ease-out forwards;
+            animation: fadeInLock 0.0s ease-out forwards;
         }
 
         @media print {
@@ -130,8 +130,8 @@
                 <div id="password-form-box" class="">
                     <label class="block text-xs font-bold uppercase tracking-wider text-amber-400 mb-2">Insert Password 👇*</label>
                     <input type="text" id="viewer-surname-input" placeholder="Put your surname here..." class="w-full px-4 py-3 bg-slate-950 border border-slate-700 rounded-xl text-xs text-slate-100 placeholder-slate-500 focus:ring-2 focus:ring-amber-500 focus:outline-none">
-                    <p class="text-[11px] text-slate-400 mt-1.5 italic">"</p>
-                    <p id="surname-error-msg" class="text-xs text-red-400 mt-2 font-semibold hidden"><i class="fa-solid fa-circle-exclamation"></i> You're not a Member?. Please try again.</p>
+                    <p class="text-[11px] text-slate-400 mt-1.5 italic"></p>
+                    <p id="Not-error-msg" class="text-xs text-red-400 mt-2 font-semibold hidden"><i class="fa-solid fa-circle-exclamation"></i> You're not a Member?. Please try again.</p>
                     
                     <button type="button" onclick="verifyViewerSurname()" class="mt-4 w-full py-3 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 text-slate-950 font-black rounded-xl text-xs shadow-lg transition flex items-center justify-center gap-2">
                         <i class="fa-solid fa-key"></i> Unlock
