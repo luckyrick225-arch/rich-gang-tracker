@@ -48,16 +48,16 @@
         /* Splash Screen Fade-in Animation */
         @keyframes fadeZoomIn {
             0% { opacity: 0; transform: scale(0.9); }
-            50% { opacity: 1; transform: scale(1.02); }
+            50% { opacity: 1; transform: scale(2.02); }
             100% { opacity: 1; transform: scale(1); }
         }
         .splash-fade-anim {
-            animation: fadeZoomIn 1.8s ease-out forwards;
+            animation: fadeZoomIn 3.8s ease-out forwards;
         }
 
         /* Lock Page Fade-In Animation */
         @keyframes fadeInLock {
-            from { opacity: 0; transform: scale(0.98); }
+            from { opacity: 0; transform: scale(0.05); }
             to { opacity: 1; transform: scale(1); }
         }
         .lock-fade-anim {
@@ -128,20 +128,20 @@
 
             <div class="p-6 space-y-4">
                 <div id="password-form-box" class="">
-                    <label class="block text-xs font-bold uppercase tracking-wider text-amber-400 mb-2">Member Surname Verification *</label>
+                    <label class="block text-xs font-bold uppercase tracking-wider text-amber-400 mb-2">Insert Password 👇*</label>
                     <input type="text" id="viewer-surname-input" placeholder="Put your surname here..." class="w-full px-4 py-3 bg-slate-950 border border-slate-700 rounded-xl text-xs text-slate-100 placeholder-slate-500 focus:ring-2 focus:ring-amber-500 focus:outline-none">
-                    <p class="text-[11px] text-slate-400 mt-1.5 italic">💡 Hint: "put your surname to open this portal"</p>
-                    <p id="surname-error-msg" class="text-xs text-red-400 mt-2 font-semibold hidden"><i class="fa-solid fa-circle-exclamation"></i> Surname not recognized in member records. Please try again.</p>
+                    <p class="text-[11px] text-slate-400 mt-1.5 italic">"</p>
+                    <p id="surname-error-msg" class="text-xs text-red-400 mt-2 font-semibold hidden"><i class="fa-solid fa-circle-exclamation"></i> You're not a Member?. Please try again.</p>
                     
                     <button type="button" onclick="verifyViewerSurname()" class="mt-4 w-full py-3 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 text-slate-950 font-black rounded-xl text-xs shadow-lg transition flex items-center justify-center gap-2">
-                        <i class="fa-solid fa-key"></i> Unlock Member View
+                        <i class="fa-solid fa-key"></i> Unlock
                     </button>
                 </div>
 
                 <!-- Step 3: Analyzing System Indicator -->
                 <div id="portal-analyzing-box" class="py-8 text-center space-y-3 hidden">
                     <div class="w-12 h-12 rounded-full border-4 border-amber-400 border-t-transparent animate-spin mx-auto"></div>
-                    <h4 class="text-sm font-bold text-white">Analyzing Surname Credentials...</h4>
+                    <h4 class="text-sm font-bold text-white">Analyzing you Credentials...</h4>
                     <p class="text-[11px] text-slate-400 font-mono">Verifying against registered group members database</p>
                 </div>
             </div>
