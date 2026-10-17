@@ -3479,7 +3479,7 @@ if (supabaseClient) {
             // Splash Screen timing sequence (Step 1 -> Step 2)
             setTimeout(() => {
                 // Reveal password gate near the end of the splash screen
-                if (!appState.isEditor) {
+                if (!appState.isViewer) {
                     const gate = document.getElementById('portal-password-gate');
                     if (gate) {
                         gate.classList.remove('hidden');
@@ -3513,7 +3513,7 @@ if (supabaseClient) {
             const analyzingBox = document.getElementById('portal-analyzing-box');
 
             if (!inputVal) {
-                errorMsg.textContent = "Please enter your surname!";
+                errorMsg.textContent = "Please insert correct password";
                 errorMsg.classList.remove('hidden');
                 return;
             }
