@@ -4382,6 +4382,129 @@ if (supabaseClient) {
             return txt;
         }
 
+        // Log Activity Function (Runs silently in background for all users)
+async function logUserActivity(actionType, details) {
+    const logEntry = {
+        user: typeof currentUser !== 'undefined' ? currentUser : 'Unknown Member',
+        action: actionType,
+        details: details,
+        timestamp: new Date().toISOString()
+    };
+
+    // Save to Supabase activity table if connected
+    if (typeof supabaseClient !== 'undefined' && supabaseClient) {
+        await supabaseClient.from('activity_logs').insert([logEntry]);
+    }
+}
+
+// Render Editor-Only Activity Record Book Modal/Section
+async function renderActivityRecordBook() {
+    const isEditor = typeof currentMode !== 'undefined' && currentMode === 'editor';
+    if (!isEditor) return; // Strict block: Hidden from regular viewers
+
+    if (typeof supabaseClient !== 'undefined' && supabaseClient) {
+        const { data: logs, error } = await supabaseClient
+            .from('activity_logs')
+            .select('*')
+            .order('timestamp', { ascending: false })
+            .limit(50);
+
+        if (!error && logs) {
+            console.table(logs); // Or render inside an editor-only dashboard container element
+        }
+    }
+                    }
+
+        // Universal Contact Formatter for Tables & Lists
+function formatContactCell(name, phone) {
+    if (!phone) return `<span class="text-slate-400">${name}</span>`;
+    
+    // Clean phone number format (removes spaces/dashes)
+    const cleanNum = phone.replace(/[^0-9+]/g, '');
+    const waNum = cleanNum.replace('+', '');
+
+    return `
+        <div class="flex flex-col">
+            <span class="text-slate-200 font-medium">${name}</span>
+            <div class="flex items-center gap-2 mt-0.5 text-xs">
+                <!-- Direct Phone Call -->
+                <a href="tel:${cleanNum}" class="text-emerald-400 hover:underline flex items-center gap-1 font-mono">
+                    📞 ${phone}
+                </a>
+                <span class="text-slate-600">|</span>
+                <!-- WhatsApp Direct Link -->
+                <a href="https://wa.me/${waNum}?text=Hello%20${encodeURIComponent(name)},%20regarding%20Rich%20Gang%20Welfare:" 
+                   target="_blank" 
+                   class="bg-emerald-600/20 text-emerald-400 hover:bg-emerald-600/30 px-1.5 py-0.5 rounded border border-emerald-500/30 font-semibold flex items-center gap-1">
+                    🟢 WhatsApp
+                </a>
+            </div>
+        </div>
+    `;
+}
+
+        // Enhanced Message Renderer with Editor-Only Controls
+function appendMessage(msg) {
+    const chatMessages = document.getElementById('chatMessages');
+    if (!chatMessages) return;
+
+    const isEditor = typeof currentMode !== 'undefined' && currentMode === 'editor';
+
+    const msgDiv = document.createElement('div');
+    msgDiv.className = "p-2.5 mb-2 bg-slate-900/90 rounded-lg border border-slate-800 text-sm relative group";
+    msgDiv.id = `msg-${msg.id || Date.now()}`;
+
+    let html = `
+        <div class="flex justify-between items-start">
+            <span class="font-bold text-amber-400">${msg.sender || 'Member'}:</span>
+            <span class="text-[10px] text-slate-500">${new Date(msg.created_at || Date.now()).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</span>
+        </div>
+        <p class="text-slate-200 mt-1">${msg.text || msg.message}</p>
+    `;
+
+    // EDITOR-ONLY ACTION BUTTONS (Delete & Share)
+    if (isEditor) {
+        html += `
+            <div class="mt-2 pt-2 border-t border-slate-800 flex items-center gap-3 text-xs">
+                <button onclick="deleteChatMessage('${msg.id}')" class="text-red-400 hover:text-red-300 font-semibold flex items-center gap-1">
+                    🗑️ Delete
+                </button>
+                <button onclick="shareChatMessage('${encodeURIComponent(msg.text || msg.message)}')" class="text-cyan-400 hover:text-cyan-300 font-semibold flex items-center gap-1">
+                    🔗 Share
+                </button>
+            </div>
+        `;
+    }
+
+    msgDiv.innerHTML = html;
+    chatMessages.appendChild(msgDiv);
+}
+
+// Delete Handler via Supabase
+async function deleteChatMessage(msgId) {
+    if (!confirm("Are you sure you want to delete this message?")) return;
+    if (typeof supabaseClient !== 'undefined' && supabaseClient) {
+        const { error } = await supabaseClient.from('messages').delete().eq('id', msgId);
+        if (error) {
+            alert("Failed to delete message: " + error.message);
+        } else {
+            const el = document.getElementById(`msg-${msgId}`);
+            if (el) el.remove();
+        }
+    }
+}
+
+// Share Handler via Web Share API or Clipboard
+function shareChatMessage(text) {
+    const decodedText = decodeURIComponent(text);
+    if (navigator.share) {
+        navigator.share({ title: 'Rich Gang Chat', text: decodedText }).catch(() => {});
+    } else {
+        navigator.clipboard.writeText(decodedText);
+        alert("Message copied to clipboard for sharing!");
+    }
+}
+
         function shareGroupReport() {
             const reportText = buildWhatsAppReportText();
             if (navigator.share) {
