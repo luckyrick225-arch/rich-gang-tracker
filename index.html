@@ -2057,23 +2057,6 @@
       loadMessages();
   })();
 </script>
-
-        <script>
-    // ==========================================
-    // SUPABASE CONFIGURATION & INITIALIZATION
-    // ==========================================
-    const SUPABASE_URL = 'https://wdpmnmxnrhhkyjzwirvi.supabase.co';
-    const SUPABASE_ANON_KEY = 'sb_publishable_HK6li2Sv535ApuK_M4WYsA_DYCUmssw';
-    
-    let supabaseClient = null;
-    
-    if (window.supabase) {
-        supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-        console.log("Supabase connected successfully.");
-    } else {
-        console.error("Supabase CDN script failed to load.");
-    }
-        </script>
         
         <!-- FOOTER -->
         <footer class="bg-slate-950 border border-slate-800 rounded-xl p-4 text-center space-y-1.5 shadow-md no-print">
