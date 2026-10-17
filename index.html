@@ -1,16 +1,19 @@
-<html lang="en"><head>
+<html lang="en">
+<head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Rich Gang Group - Member Welfare &amp; Contribution Tracker</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rich Gang Group - Member Welfare &amp; Contribution</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Supabase JS CDN (Step 2) -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <!-- FontAwesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&amp;display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <!-- html2canvas for High-Res Image Generation -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-    <style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.min.js"></script>
+    
         /* STABILIZER GEAR: Anti-flicker & stability rules */
         html, body {
             overflow-x: hidden !important;
@@ -2055,6 +2058,22 @@
   })();
 </script>
 
+        <script>
+    // ==========================================
+    // SUPABASE CONFIGURATION & INITIALIZATION
+    // ==========================================
+    const SUPABASE_URL = 'https://YOUR-PROJECT-ID.supabase.co';
+    const SUPABASE_ANON_KEY = 'YOUR-ACTUAL-ANON-KEY-HERE';
+    
+    let supabaseClient = null;
+    
+    if (window.supabase) {
+        supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        console.log("Supabase connected successfully.");
+    } else {
+        console.error("Supabase CDN script failed to load.");
+    }
+        </script>
         <!-- FOOTER -->
         <footer class="bg-slate-950 border border-slate-800 rounded-xl p-4 text-center space-y-1.5 shadow-md no-print">
             <p class="text-xs font-bold text-amber-400 uppercase tracking-wider">Rich Gang Group Welfare Portal</p>
