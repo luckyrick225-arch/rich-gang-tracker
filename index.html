@@ -3594,17 +3594,22 @@ if (supabaseClient) {
             }));
         }
 
-        function detectScreenView() {
-            const indicator = document.getElementById('view-mode-indicator');
-            const isMobile = window.innerWidth <= 768;
-            if (isMobile) {
-                indicator.textContent = "Phone View";
-                indicator.className = "text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-400 border border-amber-500/30";
-            } else {
-                indicator.textContent = "PC View";
-                indicator.className = "text-[10px] font-bold px-2 py-0.5 rounded-full bg-indigo-500/10 text-indigo-400 border border-indigo-500/30";
-            }
-        }
+        // ==========================================
+// FORCE VIEWER MODE ON STARTUP
+// ==========================================
+window.addEventListener('DOMContentLoaded', () => {
+    // Force default state to Viewer Mode
+    if (typeof setMode === 'function') {
+        setMode('viewer');
+    } else {
+        // Fallback: hide editor-only elements automatically on load
+        document.querySelectorAll('.editor-only').forEach(el => el.classList.add('hidden'));
+    }
+    
+    // Your existing startup functions
+    if (typeof detectLoggedInUser === 'function') detectLoggedInUser();
+    if (typeof loadMessages === 'function') loadMessages();
+});
 
         function calculateGroupAccountBalance() {
             let bal = 0;
