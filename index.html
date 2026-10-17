@@ -159,8 +159,21 @@
                     <div>
                         <h1 class="text-lg font-extrabold tracking-tight text-white flex items-center gap-2">
                             Rich Gang Group
-                            <span id="mode-badge" class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/30">Editor Mode</span>
-                            <span id="view-mode-indicator" class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-400 border border-amber-500/30">Phone View</span>
+                        <!-- Professional Live Clock Widget (Replaces Top-Right Buttons) -->
+<div class="flex items-center gap-1.5 bg-slate-900/90 border border-slate-700 px-3 py-2 rounded-xl shadow-md font-mono text-xs text-white">
+    <!-- Pulsing Live Dot -->
+    <span class="relative flex h-2 w-2">
+        <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+        <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+    </span>
+
+    <!-- Time & Date -->
+    <div class="flex items-center gap-1.5">
+        <span id="liveDate" class="text-slate-400 text-[10px]">-- --- ----</span>
+        <span class="text-slate-600">|</span>
+        <span id="liveTime" class="text-emerald-400 font-bold tracking-tight">00:00:00</span>
+    </div>
+</div>
                         </h1>
                         <p class="text-xs text-slate-400">Designer: <span class="text-amber-400 font-semibold">Luwagga Derick</span> • <a href="tel:+256768350920" class="text-emerald-400 underline">+256768350920</a></p>
                     </div>
