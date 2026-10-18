@@ -1986,6 +1986,7 @@
                 </div>
             </div>
         </div>
+        
         <!-- Editor-Only Activity Record Book Section -->
 <div id="editorRecordBook" class="editor-only hidden my-4 bg-slate-900 border border-amber-500/40 p-4 rounded-xl shadow-xl">
     <div class="flex justify-between items-center mb-3">
@@ -2012,6 +2013,7 @@
         </table>
     </div>
 </div>
+        
         <!-- RICH GANG MEMBER CHAT -->
 <div class="bg-slate-900 border border-slate-800 rounded-xl p-4 max-w-xl mx-auto shadow-xl text-white my-6">
     <h3 class="text-amber-400 font-bold text-lg mb-3 border-b border-slate-800 pb-2 flex items-center justify-between">
@@ -4619,6 +4621,21 @@ async function refreshActivityLogs() {
     }
 }
 
+        // Global mode variable
+let currentMode = 'viewer'; // Default on startup
+
+// Function to switch between Viewer and Editor mode
+function setMode(newMode) {
+    currentMode = newMode; // 'viewer' or 'editor'
+    
+    // Update editor visibility across the whole app
+    if (typeof updateEditorVisibility === 'function') {
+        updateEditorVisibility();
+    }
+    
+    console.log("Mode switched to:", currentMode);
+}
+        
 // Run visibility update whenever mode changes or page loads
 window.addEventListener('DOMContentLoaded', () => {
     updateEditorVisibility();
