@@ -1,0 +1,320 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Rich Gang Group - Member Welfare &amp; Contribution Tracker</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&amp;display=swap" rel="stylesheet">
+    <!-- html2canvas for High-Res Image Generation -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <!-- Supabase JS Client -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        html, body {
+            overflow-x: hidden !important;
+            width: 100% !important;
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', sans-serif;
+            -webkit-font-smoothing: antialiased;
+            text-rendering: optimizeLegibility;
+        }
+        *, ::before, ::after { box-sizing: border-box; }
+        .sticky-col-1 { position: sticky; left: 0; background-color: #090d16; z-index: 10; }
+        .sticky-col-2 { position: sticky; left: 36px; background-color: #090d16; z-index: 10; }
+        tr.member-row:hover .sticky-col-1, tr.member-row:hover .sticky-col-2 { background-color: #1a170e !important; }
+        ::-webkit-scrollbar { height: 4px; width: 4px; }
+        ::-webkit-scrollbar-track { background: #0b0f19; }
+        ::-webkit-scrollbar-thumb { background: #374151; border-radius: 4px; }
+        .table-scroll-container {
+            -webkit-overflow-scrolling: touch;
+            overflow-x: auto !important;
+            overflow-y: visible !important;
+            max-width: 100% !important;
+            transform: translateZ(0);
+        }
+        @keyframes fadeZoomIn {
+            0% { opacity: 0; transform: scale(0.9); }
+            100% { opacity: 1; transform: scale(1); }
+        }
+        .splash-fade-anim { animation: fadeZoomIn 0.8s ease-out forwards; }
+    </style>
+</head>
+<body class="bg-slate-900 text-slate-100 min-h-screen flex flex-col antialiased selection:bg-amber-500 selection:text-slate-950 w-full overflow-x-hidden">
+
+    <!-- SPLASH SCREEN -->
+    <div id="portal-splash-screen" class="fixed inset-0 bg-slate-950 z-[100] flex flex-col items-center justify-center transition-opacity duration-700">
+        <div class="text-center space-y-4 px-4 splash-fade-anim">
+            <div class="w-20 h-20 rounded-2xl bg-gradient-to-br from-amber-400 to-amber-600 flex items-center justify-center text-slate-950 font-black text-3xl shadow-2xl ring-4 ring-amber-400/30 mx-auto">
+                RG
+            </div>
+            <h1 class="text-2xl sm:text-4xl font-black text-white tracking-tight">Rich Gang Group</h1>
+            <p class="text-xs sm:text-sm text-amber-400 font-semibold uppercase tracking-widest">Welfare &amp; Contribution Portal (Supabase Cloud)</p>
+            <div class="w-32 h-1 bg-slate-800 rounded-full mx-auto overflow-hidden mt-6">
+                <div id="splash-progress-bar" class="w-full h-full bg-amber-400 transition-all duration-[2000ms]" style="width: 100%;"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- PASSWORD GATE -->
+    <div id="portal-password-gate" class="fixed inset-0 bg-slate-950/95 backdrop-blur-md z-[90] flex items-center justify-center p-4 hidden">
+        <div class="bg-slate-900 rounded-2xl max-w-md w-full mx-auto shadow-2xl border border-amber-500/30 overflow-hidden">
+            <div class="bg-slate-950 px-6 py-4 border-b border-slate-800 flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-amber-500/10 text-amber-400 flex items-center justify-center font-bold border border-amber-500/30">
+                    <i class="fa-solid fa-shield-halved text-lg"></i>
+                </div>
+                <div>
+                    <h3 class="font-black text-sm text-white">Member Portal Access</h3>
+                    <p class="text-[11px] text-slate-400">Secure Cloud Verification</p>
+                </div>
+            </div>
+            <div class="p-6 space-y-4">
+                <div>
+                    <label class="block text-xs font-bold uppercase tracking-wider text-amber-400 mb-2">Insert Password 👇</label>
+                    <input type="password" id="viewer-surname-input" placeholder="Put password here..." class="w-full px-4 py-3 bg-slate-950 border border-slate-700 rounded-xl text-xs text-slate-100 placeholder-slate-500 focus:ring-2 focus:ring-amber-500 focus:outline-none">
+                    <p id="surname-error-msg" class="text-xs text-red-400 mt-2 font-semibold hidden">Please Insert Correct Password.</p>
+                    <button type="button" onclick="verifyViewerSurname()" class="mt-4 w-full py-3 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 text-slate-950 font-black rounded-xl text-xs shadow-lg transition flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-key"></i> Unlock Portal
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- HEADER -->
+    <header class="bg-slate-950 border-b border-slate-800 text-white sticky top-0 z-30 shadow-xl w-full">
+        <div class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-3">
+            <div class="flex flex-col md:flex-row justify-between items-center gap-3">
+                <div class="flex items-center space-x-3">
+                    <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-amber-400 to-amber-600 flex items-center justify-center text-slate-950 font-black text-lg shadow-lg ring-2 ring-amber-400/30">
+                        RG
+                    </div>
+                    <div>
+                        <h1 class="text-lg font-extrabold tracking-tight text-white flex items-center gap-2">
+                            Rich Gang Group
+                            <div class="flex items-center gap-1.5 bg-slate-900/90 border border-slate-700 px-3 py-1.5 rounded-xl shadow-md font-mono text-xs text-white">
+                                <span class="relative flex h-2 w-2">
+                                    <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                                    <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+                                </span>
+                                <span id="liveDate" class="text-slate-400 text-[10px]">--</span>
+                                <span class="text-slate-600">|</span>
+                                <span id="liveTime" class="text-emerald-400 font-bold">--:--:--</span>
+                            </div>
+                        </h1>
+                        <p class="text-xs text-slate-400">Designer: <span class="text-amber-400 font-semibold">Luwagga Derick</span> • <a href="tel:+256768350920" class="text-emerald-400 underline">+256768350920</a></p>
+                    </div>
+                </div>
+
+                <div class="flex flex-wrap items-center gap-1.5">
+                    <button onclick="toggleAuthMode()" id="auth-toggle-btn" class="px-3 py-1.5 bg-slate-900 hover:bg-slate-800 text-slate-200 border border-slate-700 font-semibold rounded-lg text-xs flex items-center gap-1.5 transition">
+                        <i id="role-icon" class="fa-solid fa-lock text-amber-400"></i> Mode: <span id="current-role-text" class="text-amber-400 font-bold">Viewer</span>
+                    </button>
+                    <button onclick="loadSupabaseData()" class="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-lg text-xs flex items-center gap-1 shadow-md transition">
+                        <i class="fa-solid fa-rotate"></i> Refresh Cloud
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-4 flex-grow w-full space-y-4">
+        <!-- STATS CARD -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+            <div class="bg-slate-950 p-3 rounded-xl border border-slate-800 shadow-sm flex items-center justify-between">
+                <div>
+                    <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Group Account Balance (Supabase)</p>
+                    <h3 id="stat-account-balance" class="text-xl font-black text-amber-400 mt-0.5">UGX 0</h3>
+                </div>
+                <div class="w-8 h-8 rounded-lg bg-amber-500/10 text-amber-400 flex items-center justify-center text-sm border border-amber-500/20"><i class="fa-solid fa-vault"></i></div>
+            </div>
+        </div>
+
+        <!-- MAIN TABLE -->
+        <div class="bg-slate-950 rounded-xl border border-slate-800 shadow-xl overflow-hidden mb-4 w-full">
+            <div class="table-scroll-container">
+                <table class="w-full text-left border-collapse min-w-full" id="tracker-table">
+                    <thead class="bg-slate-900 text-slate-300 text-xs font-bold uppercase tracking-wider sticky top-0 z-20">
+                        <tr id="table-header-row">
+                            <th class="py-2.5 px-3 w-8 text-center sticky-col-1 border-b border-r border-slate-800 bg-slate-900">#</th>
+                            <th class="py-2.5 px-3 w-32 sticky-col-2 left-8 border-b border-r border-slate-800 bg-slate-900">Member Name</th>
+                            <th class="py-2.5 px-3 w-24 border-b border-r border-slate-800 text-center bg-slate-900">Village</th>
+                            <th class="py-2.5 px-3 w-20 border-b border-r border-slate-800 text-center bg-slate-900">Status</th>
+                            <!-- Dynamic List Headers injected via JS -->
+                        </tr>
+                    </thead>
+                    <tbody id="table-body" class="divide-y divide-slate-800 text-xs font-medium text-slate-200">
+                        <!-- Loaded dynamically from Supabase -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // ================= SUPABASE CONFIGURATION =================
+        // Replace with your actual Supabase URL and Anon Key
+        const SUPABASE_URL = 'YOUR_SUPABASE_URL_HERE';
+        const SUPABASE_ANON_KEY = 'YOUR_SUPABASE_ANON_KEY_HERE';
+        
+        let supabaseClient = null;
+        try {
+            supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        } catch (e) {
+            console.error("Supabase initialization error:", e);
+        }
+
+        let isAdmin = false;
+
+        // Live Clock
+        setInterval(() => {
+            const now = new Date();
+            document.getElementById('liveTime').innerText = now.toLocaleTimeString();
+            document.getElementById('liveDate').innerText = now.toLocaleDateString(undefined, {weekday: 'short', day: 'numeric', month: 'short', year: 'numeric'});
+        }, 1000);
+
+        // Splash screen dismissal
+        window.addEventListener('DOMContentLoaded', () => {
+            setTimeout(() => {
+                const splash = document.getElementById('portal-splash-screen');
+                if (splash) {
+                    splash.style.opacity = '0';
+                    setTimeout(() => splash.style.display = 'none', 700);
+                }
+            }, 1500);
+            loadSupabaseData();
+        });
+
+        // Authentication toggle
+        function toggleAuthMode() {
+            if (!isAdmin) {
+                document.getElementById('portal-password-gate').classList.remove('hidden');
+            } else {
+                isAdmin = false;
+                document.getElementById('current-role-text').innerText = 'Viewer';
+                document.getElementById('current-role-text').className = 'text-amber-400 font-bold';
+                document.getElementById('role-icon').className = 'fa-solid fa-lock text-amber-400';
+                loadSupabaseData();
+                alert('Switched to Viewer Mode');
+            }
+        }
+
+        function verifyViewerSurname() {
+            const pwd = document.getElementById('viewer-surname-input').value.trim();
+            // Set your admin password here
+            if (pwd === 'admin123' || pwd === 'Derick') {
+                isAdmin = true;
+                document.getElementById('portal-password-gate').classList.add('hidden');
+                document.getElementById('current-role-text').innerText = 'Editor';
+                document.getElementById('current-role-text').className = 'text-emerald-400 font-bold';
+                document.getElementById('role-icon').className = 'fa-solid fa-unlock text-emerald-400';
+                document.getElementById('viewer-surname-input').value = '';
+                document.getElementById('surname-error-msg').classList.add('hidden');
+                loadSupabaseData();
+                alert('Admin Access Granted!');
+            } else {
+                document.getElementById('surname-error-msg').classList.remove('hidden');
+            }
+        }
+
+        // ================= SUPABASE DATA FETCHING =================
+        async function loadSupabaseData() {
+            if (!supabaseClient) {
+                alert('Please configure your Supabase URL and Anon Key in the script tag.');
+                return;
+            }
+
+            try {
+                // Fetch lists
+                const { data: lists, error: listError } = await supabaseClient.from('lists').select('*');
+                if (listError) throw listError;
+
+                // Fetch members
+                const { data: members, error: memError } = await supabaseClient.from('members').select('*').order('id', {ascending: true});
+                if (memError) throw memError;
+
+                // Fetch contributions
+                const { data: contributions, error: contribError } = await supabaseClient.from('contributions').select('*');
+                if (contribError) throw contribError;
+
+                renderTable(lists || [], members || [], contributions || []);
+            } catch (err) {
+                console.error('Error loading data from Supabase:', err);
+            }
+        }
+
+        function renderTable(lists, members, contributions) {
+            const headerRow = document.getElementById('table-header-row');
+            // Keep base headers
+            let htmlHeader = `
+                <th class="py-2.5 px-3 w-8 text-center sticky-col-1 border-b border-r border-slate-800 bg-slate-900">#</th>
+                <th class="py-2.5 px-3 w-32 sticky-col-2 left-8 border-b border-r border-slate-800 bg-slate-900">Member Name</th>
+                <th class="py-2.5 px-3 w-24 border-b border-r border-slate-800 text-center bg-slate-900">Village</th>
+                <th class="py-2.5 px-3 w-20 border-b border-r border-slate-800 text-center bg-slate-900">Status</th>
+            `;
+
+            lists.forEach(list => {
+                htmlHeader += `<th class="py-2.5 px-3 border-b border-r border-slate-800 bg-slate-900 text-xs">${list.name}</th>`;
+            });
+            headerRow.innerHTML = htmlHeader;
+
+            const tbody = document.getElementById('table-body');
+            let bodyHtml = '';
+
+            let totalCollected = 0;
+
+            members.forEach((mem, index) => {
+                bodyHtml += `
+                    <tr class="hover:bg-slate-900/60 transition duration-150 member-row">
+                        <td class="py-2.5 px-3 text-center sticky-col-1 border-r border-slate-800 text-slate-400 bg-slate-950">${index + 1}</td>
+                        <td class="py-2.5 px-3 font-semibold text-white sticky-col-2 left-8 border-r border-slate-800 bg-slate-950 whitespace-nowrap">${mem.name}</td>
+                        <td class="py-2.5 px-3 text-center border-r border-slate-800 text-amber-300 bg-slate-950">${mem.village || '--'}</td>
+                        <td class="py-2.5 px-3 text-center border-r border-slate-800"><span class="px-2 py-0.5 rounded-full text-[10px] bg-emerald-500/10 text-emerald-400 border border-emerald-500/30">Active</span></td>
+                `;
+
+                lists.forEach(list => {
+                    const record = contributions.find(c => c.member_id === mem.id && c.list_id === list.id);
+                    const isPaid = record ? record.paid : false;
+                    if (isPaid) totalCollected += 5000; // Assuming target 5000 per list item
+
+                    bodyHtml += `
+                        <td class="py-2.5 px-3 text-center border-r border-slate-800">
+                            <input type="checkbox" ${isPaid ? 'checked' : ''} ${!isAdmin ? 'disabled' : ''} 
+                                onchange="updateContribution('${mem.id}', '${list.id}', this.checked)" class="w-4 h-4 accent-emerald-500 cursor-pointer">
+                        </td>
+                    `;
+                });
+
+                bodyHtml += `</tr>`;
+            });
+
+            tbody.innerHTML = bodyHtml;
+            document.getElementById('stat-account-balance.innerText = `UGX ${totalCollected.toLocaleString()}`;
+        }
+
+        async function updateContribution(memberId, listId, paidStatus) {
+            if (!isAdmin) {
+                alert('Please unlock Editor mode first.');
+                loadSupabaseData();
+                return;
+            }
+
+            try {
+                const { error } = await supabaseClient
+                    .from('contributions')
+                    .upsert({ member_id: memberId, list_id: listId, paid: paidStatus }, { onConflict: 'member_id,list_id' });
+
+                if (error) throw error;
+                loadSupabaseData();
+            } catch (err) {
+                console.error('Error updating contribution:', err);
+                alert('Failed to update contribution in Supabase.');
+            }
+        }
+    </script>
+</body>
+</html>
