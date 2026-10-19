@@ -2980,48 +2980,7 @@
         <span id="toast-message" class="text-xs font-semibold">Preparing and pushing update to GitHub...</span>
     </div>
 
-    <script>
-        // ==========================================
-// PORTAL CLOUD DATA FUNCTIONS
-// ==========================================
-
-// 1. Load All Members & Transactions from Supabase
-async function loadPortalData() {
-    if (!supabaseClient) return;
-
-    try {
-        // Fetch Members
-        const { data: members, error: memberError } = await supabaseClient.from('members').select('*');
-        if (memberError) console.error("Error loading members:", memberError.message);
-        else console.log("Loaded members from cloud:", members);
-
-        // Fetch Transactions/Contributions
-        const { data: transactions, error: txError } = await supabaseClient.from('transactions').select('*');
-        if (txError) console.error("Error loading transactions:", txError.message);
-        else console.log("Loaded transactions from cloud:", transactions);
-
-        // TODO: Pass 'members' and 'transactions' into your UI rendering functions here
-    } catch (err) {
-        console.error("Cloud data fetch failed:", err);
-    }
-}
-
-// 2. Save a New Member or Transaction Live
-async function addMemberToCloud(name, role, phone) {
-    if (!supabaseClient) return;
-
-    const { data, error } = await supabaseClient
-        .from('members')
-        .insert([{ name: name, role: role, phone: phone }]);
-
-    if (error) {
-        alert("Failed to save member: " + error.message);
-    } else {
-        console.log("Member saved to cloud successfully!");
-        loadPortalData(); // Refresh data
-    }
-        }
-        
+    <script>   
         let INITIAL_LISTS = [
     {
         "id": "list-1",
@@ -3489,7 +3448,7 @@ async function addMemberToCloud(name, role, phone) {
             // Splash Screen timing sequence (Step 1 -> Step 2)
             setTimeout(() => {
                 // Reveal password gate near the end of the splash screen
-                if (!appState.isEditor) {
+                if (!appState.isviewer) {
                     const gate = document.getElementById('portal-password-gate');
                     if (gate) {
                         gate.classList.remove('hidden');
@@ -3553,6 +3512,77 @@ async function addMemberToCloud(name, role, phone) {
             }
         }
 
+        function detectScreenView() {
+            const indicator = document.getElementById('view-mode-indicator');
+            const isMobile = window.innerWidth <= 768;
+            if (isMobile) {
+                indicator.textContent = "Phone View";
+                indicator.className = "text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-400 border border-amber-500/30";
+            } else {
+                indicator.textContent = "PC View";
+                indicator.className = "text-[10px] font-bold px-2 py-0.5 rounded-full bg-indigo-500/10 text-indigo-400 border border-indigo-500/30";
+            }
+        }
+
+        async function loadPortalData() {
+    if (!supabaseClient) return;
+
+    setCloudStatus('syncing', 'Fetching Supabase...');
+
+    try {
+        const { data: members, error: memberError } = await supabaseClient.from('members').select('*');
+        const { data: transactions, error: txError } = await supabaseClient.from('transactions').select('*');
+
+        if (memberError || txError) {
+            setCloudStatus('error', 'Fetch Failed');
+        } else {
+            setCloudStatus('live', 'Supabase Synced');
+        }
+    } catch (err) {
+        setCloudStatus('error', 'Offline');
+    }
+        }
+
+        // PORTAL CLOUD DATA FUNCTIONS
+// ==========================================
+
+// 1. Load All Members & Transactions from Supabase
+async function loadPortalData() {
+    if (!supabaseClient) return;
+
+    try {
+        // Fetch Members
+        const { data: members, error: memberError } = await supabaseClient.from('members').select('*');
+        if (memberError) console.error("Error loading members:", memberError.message);
+        else console.log("Loaded members from cloud:", members);
+
+        // Fetch Transactions/Contributions
+        const { data: transactions, error: txError } = await supabaseClient.from('transactions').select('*');
+        if (txError) console.error("Error loading transactions:", txError.message);
+        else console.log("Loaded transactions from cloud:", transactions);
+
+        // TODO: Pass 'members' and 'transactions' into your UI rendering functions here
+    } catch (err) {
+        console.error("Cloud data fetch failed:", err);
+    }
+}
+
+// 2. Save a New Member or Transaction Live
+async function addMemberToCloud(name, role, phone) {
+    if (!supabaseClient) return;
+
+    const { data, error } = await supabaseClient
+        .from('members')
+        .insert([{ name: name, role: role, phone: phone }]);
+
+    if (error) {
+        alert("Failed to save member: " + error.message);
+    } else {
+        console.log("Member saved to cloud successfully!");
+        loadPortalData(); // Refresh data
+    }
+}
+
         // Listen for live updates across the whole portal
 if (supabaseClient) {
     supabaseClient
@@ -3595,38 +3625,7 @@ window.addEventListener('DOMContentLoaded', () => {
         dot.style.background = '#ef4444';
         text.innerText = message || 'Sync Error';
     }
-        }
-
-        function detectScreenView() {
-            const indicator = document.getElementById('view-mode-indicator');
-            const isMobile = window.innerWidth <= 768;
-            if (isMobile) {
-                indicator.textContent = "Phone View";
-                indicator.className = "text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-400 border border-amber-500/30";
-            } else {
-                indicator.textContent = "PC View";
-                indicator.className = "text-[10px] font-bold px-2 py-0.5 rounded-full bg-indigo-500/10 text-indigo-400 border border-indigo-500/30";
             }
-        }
-
-        async function loadPortalData() {
-    if (!supabaseClient) return;
-
-    setCloudStatus('syncing', 'Fetching Supabase...');
-
-    try {
-        const { data: members, error: memberError } = await supabaseClient.from('members').select('*');
-        const { data: transactions, error: txError } = await supabaseClient.from('transactions').select('*');
-
-        if (memberError || txError) {
-            setCloudStatus('error', 'Fetch Failed');
-        } else {
-            setCloudStatus('live', 'Supabase Synced');
-        }
-    } catch (err) {
-        setCloudStatus('error', 'Offline');
-    }
-        }
 
         function calculateGroupAccountBalance() {
             let bal = 0;
