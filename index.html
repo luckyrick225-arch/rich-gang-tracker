@@ -915,7 +915,7 @@ const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_
         ];
 
         function initData() {
-    // 1. Force the splash screen to hide immediately so the app opens
+    // 1. Instantly force hide the splash screen so you are never locked out
     const splash = document.getElementById('splash-screen') || document.querySelector('.splash-screen');
     if (splash) {
         splash.style.display = 'none';
@@ -927,11 +927,18 @@ const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_
     }
 
     // 3. Core UI setup and screen detectors
-    if (typeof sortAlphabetically === 'function') sortAlphabetically();
-    if (typeof detectScreenView === 'function') detectScreenView();
+    if (typeof sortAlphabetically === 'function') {
+        sortAlphabetically();
+    }
+    
+    if (typeof detectScreenView === 'function') {
+        detectScreenView();
+    }
     
     window.addEventListener('resize', () => {
-        if (typeof detectScreenView === 'function') detectScreenView();
+        if (typeof detectScreenView === 'function') {
+            detectScreenView();
+        }
     });
     
     const txDate = document.getElementById('tx-date');
@@ -942,28 +949,8 @@ const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_
     if (typeof renderApp === 'function') {
         renderApp();
     }
-        }
+} // <-- This correctly closes initData() once at the very end
 
-    // Core UI setup and screen detectors
-    if (typeof sortAlphabetically === 'function') sortAlphabetically();
-    if (typeof detectScreenView === 'function') detectScreenView();
-
-    window.addEventListener('resize', () => {
-        if (typeof detectScreenView === 'function') detectScreenView();
-    });
-
-    const txDate = document.getElementById('tx-date');
-    if (txDate) {
-        txDate.valueAsDate = new Date();
-    }
-
-    if (typeof renderApp === 'function') {
-        renderApp();
-    }
-        }
-
-            // Splash Screen timing sequence (Step 1 -> Step 2)
-            setTimeout(() => {
                 // Reveal password gate near the end of the splash screen
                 if (!appState.isEditor) {
                     const gate = document.getElementById('portal-password-gate');
@@ -1089,7 +1076,6 @@ const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_
 
         function renderApp() {
             sortAlphabetically();
-            saveLocalState();
             renderRoleUI();
             renderListCards();
             renderHeaders();
