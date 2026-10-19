@@ -914,24 +914,35 @@ const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_
             { "id": "mem-40", "name": "Waswa, Hassan", "village": "Kajjansi", "phone": "", "payments": { "list-1": true } }
         ];
 
-        let INITIAL_TRANSACTIONS = [];
-
-        let appState = {
-            lists: INITIAL_LISTS,
-            members: INITIAL_MEMBERS,
-            transactions: INITIAL_TRANSACTIONS,
-            filter: 'all',
-            search: '',
-            isEditor: false
-        };
-
-        function sortAlphabetically() {
-            appState.members.sort((a, b) => a.name.localeCompare(b.name, undefined, { sensitivity: 'accent' }));
-        }
-
         function initData() {
-    // Load fresh data straight from Supabase on startup
-    loadPortalData();
+    // 1. Force the splash screen to hide immediately so the app opens
+    const splash = document.getElementById('splash-screen') || document.querySelector('.splash-screen');
+    if (splash) {
+        splash.style.display = 'none';
+    }
+
+    // 2. Load fresh data straight from Supabase on startup
+    if (typeof loadPortalData === 'function') {
+        loadPortalData();
+    }
+
+    // 3. Core UI setup and screen detectors
+    if (typeof sortAlphabetically === 'function') sortAlphabetically();
+    if (typeof detectScreenView === 'function') detectScreenView();
+    
+    window.addEventListener('resize', () => {
+        if (typeof detectScreenView === 'function') detectScreenView();
+    });
+    
+    const txDate = document.getElementById('tx-date');
+    if (txDate) {
+        txDate.valueAsDate = new Date();
+    }
+    
+    if (typeof renderApp === 'function') {
+        renderApp();
+    }
+        }
 
     // Core UI setup and screen detectors
     if (typeof sortAlphabetically === 'function') sortAlphabetically();
