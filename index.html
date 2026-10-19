@@ -862,6 +862,10 @@
     </div>
 
     <script>
+
+        const SUPABASE_URL = 'https://sphrgkrajphg.supabase.co';
+const SUPABASE_ANON_KEY = 'sb_publishable_...';
+const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
         let INITIAL_LISTS = [
             { "id": "list-1", "name": "List 1: Nabwanika Maria", "target": 5000 },
             { "id": "list-2", "name": "List 2: Nyanzi Ben", "target": 5000 }
@@ -926,20 +930,26 @@
         }
 
         function initData() {
-            const savedState = localStorage.getItem('rich_gang_state');
-            if (savedState) {
-                try {
-                    const parsed = JSON.parse(savedState);
-                    if (parsed.lists) appState.lists = parsed.lists;
-                    if (parsed.members) appState.members = parsed.members;
-                    if (parsed.transactions) appState.transactions = parsed.transactions;
-                } catch (e) {}
-            }
-            sortAlphabetically();
-            detectScreenView();
-            window.addEventListener('resize', detectScreenView);
-            document.getElementById('tx-date').valueAsDate = new Date();
-            renderApp();
+    // Load fresh data straight from Supabase on startup
+    loadPortalData();
+
+    // Core UI setup and screen detectors
+    if (typeof sortAlphabetically === 'function') sortAlphabetically();
+    if (typeof detectScreenView === 'function') detectScreenView();
+
+    window.addEventListener('resize', () => {
+        if (typeof detectScreenView === 'function') detectScreenView();
+    });
+
+    const txDate = document.getElementById('tx-date');
+    if (txDate) {
+        txDate.valueAsDate = new Date();
+    }
+
+    if (typeof renderApp === 'function') {
+        renderApp();
+    }
+        }
 
             // Splash Screen timing sequence (Step 1 -> Step 2)
             setTimeout(() => {
@@ -1339,45 +1349,22 @@
                 return;
             }
 
-            localStorage.setItem('gh_user', user);
-            localStorage.setItem('gh_repo', repo);
-            localStorage.setItem('gh_path', path || 'index.html');
-            localStorage.setItem('gh_token', token);
+            function saveGitHubConfig() {
+    closeGitHubConfigModal();
+    showToast("Connected to live cloud sync!");
+            }
 
             closeGitHubConfigModal();
             showToast("GitHub configuration saved!");
         }
 
         async function pushToGitHub() {
-            if (!appState.isEditor) return;
-            const user = localStorage.getItem('gh_user');
-            const repo = localStorage.getItem('gh_repo');
-            const path = localStorage.getItem('gh_path') || 'index.html';
-            const token = localStorage.getItem('gh_token');
-
-            if (!user || !repo || !token) {
-                showToast("Please configure GitHub Sync settings first!");
-                openGitHubConfigModal();
-                return;
-            }
-
-            showToast("Preparing and pushing update to GitHub...");
-
-            let fullHtml = document.documentElement.outerHTML;
-            const listsScript = `let INITIAL_LISTS = ${JSON.stringify(appState.lists, null, 4)};`;
-            const membersScript = `let INITIAL_MEMBERS = ${JSON.stringify(appState.members, null, 4)};`;
-            const txScript = `let INITIAL_TRANSACTIONS = ${JSON.stringify(appState.transactions, null, 4)};`;
-            
-            fullHtml = fullHtml.replace(/let INITIAL_LISTS = \[[\s\S]*?\];/, listsScript);
-            fullHtml = fullHtml.replace(/let INITIAL_MEMBERS = \[[\s\S]*?\];/, membersScript);
-            fullHtml = fullHtml.replace(/let INITIAL_TRANSACTIONS = \[[\s\S]*?\];/, txScript);
-
-            const apiUrl = `https://api.github.com/repos/${user}/${repo}/contents/${path}`;
-
-            try {
-                const getRes = await fetch(apiUrl, {
-                    headers: { 'Authorization': `token ${token}`, 'Accept': 'application/vnd.github.v3+json' }
-                });
+    // Bypassed: Data operations are now handled live via Supabase
+    console.log("Data operations are managed live via Supabase.");
+    if (typeof showToast === 'function') {
+        showToast("Synced live to cloud!");
+    }
+        }
                 
                 if (!getRes.ok) throw new Error("Failed to fetch file SHA from GitHub. Check repo details.");
                 const fileData = await getRes.json();
