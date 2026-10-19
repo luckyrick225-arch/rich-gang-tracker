@@ -2124,6 +2124,23 @@ const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_
         }
 
         window.onload = initData;
+
+        // Force execution immediately when the window finishes loading
+window.addEventListener('load', () => {
+    const splash = document.getElementById('splash-screen') || document.querySelector('.splash-screen');
+    if (splash) {
+        splash.style.display = 'none';
+        splash.remove(); // Completely deletes the element so it can never block you again
+    }
+    
+    // Trigger data loading safely
+    if (typeof loadPortalData === 'function') {
+        loadPortalData();
+    }
+    if (typeof renderApp === 'function') {
+        renderApp();
+    }
+});
     </script>
 
 </body></html>
