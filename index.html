@@ -952,7 +952,7 @@ const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_
 } // <-- This correctly closes initData() once at the very end
 
                 // Reveal password gate near the end of the splash screen
-                if (!appState.isEditor) {
+                if (!appState.isViewer) {
                     const gate = document.getElementById('portal-password-gate');
                     if (gate) {
                         gate.classList.remove('hidden');
