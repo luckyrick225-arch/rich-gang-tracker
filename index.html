@@ -2040,6 +2040,47 @@
           }
       });
 
+      // 1. Add a Member (Name, Role, Phone)
+async function addMemberToCloud(name, role, phone) {
+    if (!supabaseClient) return;
+
+    const { error } = await supabaseClient
+        .from('members')
+        .insert([{ 
+            name: name, 
+            role: role || 'Member', 
+            phone: phone || '' 
+        }]);
+
+    if (error) {
+        console.error("Error saving member:", error.message);
+        alert("Failed to save member: " + error.message);
+    } else {
+        console.log("Member saved live to cloud!");
+    }
+}
+
+// 2. Add a Contribution / Transaction (Member Name, List Name, Expected, Collected)
+async function addTransactionToCloud(memberName, listName, expected, collected) {
+    if (!supabaseClient) return;
+
+    const { error } = await supabaseClient
+        .from('transactions')
+        .insert([{ 
+            member_name: memberName, 
+            list_name: listName, 
+            amount_expected: Number(expected) || 0, 
+            amount_collected: Number(collected) || 0 
+        }]);
+
+    if (error) {
+        console.error("Error saving transaction:", error.message);
+        alert("Failed to save transaction: " + error.message);
+    } else {
+        console.log("Contribution saved live to cloud!");
+    }
+    }
+      
       // Realtime Listener
       supabaseClient
           .channel('public:messages')
@@ -2053,6 +2094,34 @@
       detectLoggedInUser();
       loadMessages();
   })();
+
+    // ==========================================
+// REALTIME LISTENERS FOR MEMBERS & TRANSACTIONS
+// ==========================================
+if (supabaseClient) {
+    supabaseClient
+        .channel('portal-realtime-channel')
+        // Listen to any changes in the 'members' table
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'members' }, payload => {
+            console.log('Realtime update on Members:', payload);
+            loadPortalData(); // Reloads members automatically
+        })
+        // Listen to any changes in the 'transactions' table
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'transactions' }, payload => {
+            console.log('Realtime update on Transactions:', payload);
+            loadPortalData(); // Reloads transactions & list totals automatically
+        })
+        .subscribe((status) => {
+            if (status === 'SUBSCRIBED') {
+                console.log('Realtime portal connection active 24/7!');
+            }
+        });
+    }
+
+    // This fetches your initial data from Supabase as soon as the page opens
+window.addEventListener('DOMContentLoaded', () => {
+    loadPortalData();
+});
 </script>
 
         <!-- FOOTER -->
