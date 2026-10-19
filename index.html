@@ -912,44 +912,44 @@ const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_
             { "id": "mem-38", "name": "Sserwadda, Nalongo", "village": "Zana", "phone": "", "payments": { "list-1": true, "list-2": true } },
             { "id": "mem-39", "name": "Tebeewa, Beatrice", "village": "Busega", "phone": "", "payments": { "list-1": true, "list-2": true } },
             { "id": "mem-40", "name": "Waswa, Hassan", "village": "Kajjansi", "phone": "", "payments": { "list-1": true } }
-        ];
 
-        function initData() {
-    // 1. Instantly force hide the splash screen so you are never locked out
-    const splash = document.getElementById('splash-screen') || document.querySelector('.splash-screen');
-    if (splash) {
-        splash.style.display = 'none';
-    }
+            function initData() {
+            // 1. Instantly force hide the splash screen so you are never locked out
+            const splash = document.getElementById('portal-splash-screen') || document.getElementById('splash-screen') || document.querySelector('.splash-screen');
+            if (splash) {
+                splash.style.display = 'none';
+                splash.remove();
+            }
 
-    // 2. Load fresh data straight from Supabase on startup
-    if (typeof loadPortalData === 'function') {
-        loadPortalData();
-    }
+            // 2. Load fresh data straight from Supabase on startup
+            if (typeof loadPortalData === 'function') {
+                loadPortalData();
+            }
 
-    // 3. Core UI setup and screen detectors
-    if (typeof sortAlphabetically === 'function') {
-        sortAlphabetically();
-    }
-    
-    if (typeof detectScreenView === 'function') {
-        detectScreenView();
-    }
-    
-    window.addEventListener('resize', () => {
-        if (typeof detectScreenView === 'function') {
-            detectScreenView();
+            // 3. Core UI setup and screen detectors
+            if (typeof sortAlphabetically === 'function') {
+                sortAlphabetically();
+            }
+            
+            if (typeof detectScreenView === 'function') {
+                detectScreenView();
+            }
+            
+            window.addEventListener('resize', () => {
+                if (typeof detectScreenView === 'function') {
+                    detectScreenView();
+                }
+            });
+            
+            const txDate = document.getElementById('tx-date');
+            if (txDate) {
+                txDate.valueAsDate = new Date();
+            }
+            
+            if (typeof renderApp === 'function') {
+                renderApp();
+            }
         }
-    });
-    
-    const txDate = document.getElementById('tx-date');
-    if (txDate) {
-        txDate.valueAsDate = new Date();
-    }
-    
-    if (typeof renderApp === 'function') {
-        renderApp();
-    }
-} // <-- This correctly closes initData() once at the very end
 
                 // Reveal password gate near the end of the splash screen
                 if (!appState.isViewer) {
@@ -959,7 +959,7 @@ const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_
                         gate.classList.add('lock-fade-anim');
                     }
                 }
-            }, 1500);
+            }
 
             setTimeout(() => {
                 const splash = document.getElementById('portal-splash-screen');
@@ -967,15 +967,15 @@ const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_
                     splash.style.opacity = '0';
                     setTimeout(() => {
                         splash.style.display = 'none';
-                    }, 700);
+                    }
                 }
-            }, 2200);
+            }
 
             // Animate splash progress bar
             setTimeout(() => {
                 const bar = document.getElementById('splash-progress-bar');
                 if (bar) bar.style.width = '100%';
-            }, 100);
+            },
         }
 
         // Surname Password Detector & Analyzing System (Step 2 & 3)
