@@ -2021,7 +2021,50 @@ async function addMemberToCloud(name, role, phone) {
         loadPortalData(); // Refresh data
     }
 }
+// ==========================================
+// FULL WEB SUPABASE CLOUD SYNC
+// ==========================================
 
+// 1. Fetch All Lists / Contributions from Cloud
+async function fetchCloudData() {
+    if (!supabaseClient) return;
+
+    const { data: transactions, error } = await supabaseClient
+        .from('transactions')
+        .select('*');
+
+    if (error) {
+        console.error("Error loading live portal data:", error.message);
+    } else if (transactions) {
+        console.log("Portal data loaded from cloud:", transactions);
+        // Call your UI render functions here to display list subtotals and balances
+    }
+}
+
+// 2. Save/Update a Contribution or List Receipt in the Cloud
+async function saveTransactionToCloud(memberName, listName, expected, collected) {
+    if (!supabaseClient) return;
+
+    const { data, error } = await supabaseClient
+        .from('transactions')
+        .insert([
+            {
+                member_name: memberName,
+                list_name: listName,
+                amount_expected: expected,
+                amount_collected: collected
+            }
+        ]);
+
+    if (error) {
+        console.error("Error saving to cloud:", error.message);
+        alert("Failed to sync change to live database: " + error.message);
+    } else {
+        console.log("Saved live to cloud successfully!");
+        fetchCloudData(); // Reload live portal data
+    }
+}
+      
       // Auto-detect logged in portal user name
       function detectLoggedInUser() {
           let loggedName = 'Guest Member';
