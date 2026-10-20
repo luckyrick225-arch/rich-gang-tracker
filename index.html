@@ -162,7 +162,7 @@
                             Rich Gang Group
                             <!-- Professional Live Clock Widget (Replaces Top-Right Buttons) -->
 <div class="flex items-center gap-1.5 bg-slate-900/90 border border-slate-700 px-3 py-2 rounded-xl shadow-md font-mono text-xs text-white">
-    <div class="flex items-center gap-1.5 text-xs font-mono text-amber-400 bg-slate-950 px-2.5 py-1 rounded-lg border border-slate-800">
+  <div class="flex items-center gap-1.5 text-xs font-mono text-amber-400 bg-slate-950 px-2.5 py-1 rounded-lg border border-slate-800">
     <i class="fa-regular fa-clock"></i>
     <span id="live-clock-display">Loading time...</span>
 </div>
@@ -2190,7 +2190,23 @@ if (supabaseClient) {
 window.addEventListener('DOMContentLoaded', () => {
     loadPortalData();
 });
+
+    // Add this function anywhere in your script block
+function startLiveClock() {
+    function updateClock() {
+        const now = new Date();
+        const dateStr = now.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
+        const timeStr = now.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+        
+        const clockEl = document.getElementById('live-clock-display');
+        if (clockEl) {
+            clockEl.textContent = `${dateStr} | ${timeStr}`;
+        }
+    }
     
+    updateClock(); 
+    setInterval(updateClock, 1000); // Ticks live every second
+}
     </script>
 
         <!-- FOOTER -->
@@ -3664,24 +3680,6 @@ window.addEventListener('DOMContentLoaded', () => {
                 indicator.className = "text-[10px] font-bold px-2 py-0.5 rounded-full bg-indigo-500/10 text-indigo-400 border border-indigo-500/30";
             }
         }
-
-        // Start the Live Ticking Clock
-function startLiveClock() {
-    function updateClock() {
-        const now = new Date();
-        // Formats date and live running time nicely
-        const dateStr = now.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
-        const timeStr = now.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
-        
-        const clockEl = document.getElementById('live-clock-display');
-        if (clockEl) {
-            clockEl.textContent = `${dateStr} | ${timeStr}`;
-        }
-    }
-    
-    updateClock(); // Run immediately on load
-    setInterval(updateClock, 1000); // Update every 1 second (ticks live)
-}
         
         function calculateGroupAccountBalance() {
             let bal = 0;
