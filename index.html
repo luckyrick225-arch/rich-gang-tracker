@@ -2095,6 +2095,15 @@ _supabase
   })
   .subscribe();
     
+    async function loadMembers() {
+    const { data, error } = await _supabase.from('members').select('*');
+    if (error) console.error('Error loading data:', error);
+    else renderTable(data);
+}
+    async function saveMember(memberData) {
+    const { data, error } = await _supabase.from('members').upsert([memberData]);
+    if (error) console.error('Error saving:', error);
+}
     </script>
 
         <!-- FOOTER -->
