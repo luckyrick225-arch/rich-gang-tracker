@@ -1958,24 +1958,8 @@
                 </div>
             </div>
         </div>
-        <!-- RICH GANG MEMBER CHAT -->
-<div class="bg-slate-900 border border-slate-800 rounded-xl p-4 max-w-xl mx-auto shadow-xl text-white my-6">
-    <h3 class="text-amber-400 font-bold text-lg mb-3 border-b border-slate-800 pb-2 flex items-center justify-between">
-        <span>💬 Rich Gang Member Chat</span>
-        <span class="text-xs text-slate-400 font-normal">Live Member Sync</span>
-    </h3>
-    
-    <!-- Messages Window -->
-    <div id="chat-messages" class="h-72 overflow-y-auto bg-slate-950 p-3 rounded-lg space-y-2 mb-3 text-sm border border-slate-800 flex flex-col"><div class="p-2.5 rounded bg-slate-900 border border-slate-800 text-xs shadow-sm"><span class="text-amber-400 font-bold">Luwagga:</span> <span class="text-slate-200">Hi</span></div><div class="p-2.5 rounded bg-slate-900 border border-slate-800 text-xs shadow-sm"><span class="text-amber-400 font-bold">Guest Member:</span> <span class="text-slate-200">HellO</span></div><div class="p-2.5 rounded bg-slate-900 border border-slate-800 text-xs shadow-sm"><span class="text-amber-400 font-bold">Luwagga:</span> <span class="text-slate-200">Good morning</span></div><div class="p-2.5 rounded bg-slate-900 border border-slate-800 text-xs shadow-sm"><span class="text-amber-400 font-bold">Guest Member:</span> <span class="text-slate-200">Good morning to you so</span></div><div class="p-2.5 rounded bg-slate-900 border border-slate-800 text-xs shadow-sm"><span class="text-amber-400 font-bold">Luwagga:</span> <span class="text-slate-200">How are you?</span></div><div class="p-2.5 rounded bg-slate-900 border border-slate-800 text-xs shadow-sm"><span class="text-amber-400 font-bold">Guest Member:</span> <span class="text-slate-200">Good morning</span></div></div>
-
-    <!-- Chat Form -->
-    <form id="chat-form" class="flex gap-2">
-        <input type="text" id="chat-name" placeholder="Member Name" readonly="" class="bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-xs w-1/3 text-amber-400 font-bold focus:outline-none cursor-not-allowed">
-        <input type="text" id="chat-input" placeholder="Type a message..." required="" class="bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-xs flex-1 focus:outline-none focus:border-amber-400 text-white">
-        <button type="submit" id="chat-send-btn" class="bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold px-4 py-2 rounded-lg text-xs transition">Send</button>
-    </form>
-</div>
-
+        
+        <script>
 <!-- Supabase JS Library -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
@@ -1984,101 +1968,66 @@
       const SUPABASE_ANON_KEY = 'sb_publishable_Mt9-vnMXeo_4E3PUwW2NPw_SnY6uIsS'; // 👈 Paste your sb_p... key here
 
       const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    // ==========================================
+// PORTAL CLOUD DATA FUNCTIONS
+// ==========================================
 
-      const chatForm = document.getElementById('chat-form');
-      const chatMessages = document.getElementById('chat-messages');
-      const chatInput = document.getElementById('chat-input');
-      const chatName = document.getElementById('chat-name');
+// 1. Load All Members & Transactions from Supabase
+async function loadPortalData() {
+    if (!supabaseClient) return;
 
-      // Auto-detect logged in portal user name
-      function detectLoggedInUser() {
-          let loggedName = 'Guest Member';
-          if (typeof currentEditor !== 'undefined' && currentEditor) {
-              loggedName = currentEditor;
-          } else if (localStorage.getItem('rich_gang_username')) {
-              loggedName = localStorage.getItem('rich_gang_username');
-          } else if (localStorage.getItem('portal_user')) {
-              loggedName = localStorage.getItem('portal_user');
-          }
-          chatName.value = loggedName;
-      }
+    try {
+        // Fetch Members
+        const { data: members, error: memberError } = await supabaseClient.from('members').select('*');
+        if (memberError) console.error("Error loading members:", memberError.message);
+        else console.log("Loaded members from cloud:", members);
 
-      function safeEscape(str) {
-          if (typeof escapeHtml === 'function') return escapeHtml(str);
-          const map = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' };
-          return String(str).replace(/[&<>"']/g, m => map[m]);
-      }
+        // Fetch Transactions/Contributions
+        const { data: transactions, error: txError } = await supabaseClient.from('transactions').select('*');
+        if (txError) console.error("Error loading transactions:", txError.message);
+        else console.log("Loaded transactions from cloud:", transactions);
 
-      function appendMessage(data) {
-          const msgDiv = document.createElement('div');
-          msgDiv.className = "p-2.5 rounded bg-slate-900 border border-slate-800 text-xs shadow-sm";
-          msgDiv.innerHTML = `<span class="text-amber-400 font-bold">${safeEscape(data.name)}:</span> <span class="text-slate-200">${safeEscape(data.text)}</span>`;
-          chatMessages.appendChild(msgDiv);
-      }
+        // TODO: Pass 'members' and 'transactions' into your UI rendering functions here
+    } catch (err) {
+        console.error("Cloud data fetch failed:", err);
+    }
+}
 
-      async function loadMessages() {
-          const { data, error } = await supabaseClient
-              .from('messages')
-              .select('*')
-              .order('created_at', { ascending: true })
-              .limit(50);
+// 2. Save a New Member or Transaction Live
+async function addMemberToCloud(name, role, phone) {
+    if (!supabaseClient) return;
 
-          if (error) {
-              console.error('Error loading messages:', error);
-              chatMessages.innerHTML = '<div class="text-xs text-red-400 py-2">Failed to load chat history. Check API Key.</div>';
-              return;
-          }
+    const { data, error } = await supabaseClient
+        .from('members')
+        .insert([{ name: name, role: role, phone: phone }]);
 
-          chatMessages.innerHTML = '';
-          if (data && data.length > 0) {
-              data.forEach(msg => appendMessage(msg));
-          } else {
-              chatMessages.innerHTML = '<div class="text-xs text-slate-500 italic text-center py-2">No messages yet. Start the conversation!</div>';
-          }
-          chatMessages.scrollTop = chatMessages.scrollHeight;
-      }
+    if (error) {
+        alert("Failed to save member: " + error.message);
+    } else {
+        console.log("Member saved to cloud successfully!");
+        loadPortalData(); // Refresh data
+    }
+}
+      // Listen for live updates across the whole portal
+if (supabaseClient) {
+    supabaseClient
+        .channel('public:portal_updates')
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'transactions' }, payload => {
+            console.log("Live transaction change detected:", payload);
+            loadPortalData(); // Automatically refresh data on screen
+        })
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'members' }, payload => {
+            console.log("Live member change detected:", payload);
+            loadPortalData(); // Automatically refresh data on screen
+        })
+        .subscribe();
+}
 
-      chatForm.addEventListener('submit', async (e) => {
-          e.preventDefault();
-          detectLoggedInUser();
-          
-          const name = chatName.value.trim() || 'Member';
-          const message = chatInput.value.trim();
-          if(!message) return;
-
-          const btn = document.getElementById('chat-send-btn');
-          btn.disabled = true;
-          btn.innerText = 'Sending...';
-
-          const { error } = await supabaseClient
-              .from('messages')
-              .insert([{ name: name, text: message }]);
-
-          btn.disabled = false;
-          btn.innerText = 'Send';
-
-          if (error) {
-              console.error('Error sending message:', error);
-              alert('Failed to send message: ' + error.message);
-          } else {
-              chatInput.value = '';
-          }
-      });
-
-      // Realtime Listener
-      supabaseClient
-          .channel('public:messages')
-          .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'messages' }, payload => {
-              appendMessage(payload.new);
-              chatMessages.scrollTop = chatMessages.scrollHeight;
-          })
-          .subscribe();
-
-      // Initialize
-      detectLoggedInUser();
-      loadMessages();
-  })();
-
+// Run when page loads
+window.addEventListener('DOMContentLoaded', () => {
+    loadPortalData();
+});
+      
     // Professional Clocking Timestamp Engine
 function startLiveTimestamp() {
     function updateClock() {
