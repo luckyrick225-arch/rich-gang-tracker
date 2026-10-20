@@ -3674,6 +3674,24 @@ window.addEventListener('DOMContentLoaded', () => {
             }
         }
 
+        // Start the Live Ticking Clock
+function startLiveClock() {
+    function updateClock() {
+        const now = new Date();
+        // Formats date and live running time nicely
+        const dateStr = now.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
+        const timeStr = now.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+        
+        const clockEl = document.getElementById('live-clock-display');
+        if (clockEl) {
+            clockEl.textContent = `${dateStr} | ${timeStr}`;
+        }
+    }
+    
+    updateClock(); // Run immediately on load
+    setInterval(updateClock, 1000); // Update every 1 second (ticks live)
+}
+        
         function calculateGroupAccountBalance() {
             let bal = 0;
             appState.transactions.forEach(t => {
