@@ -2069,6 +2069,7 @@
       detectLoggedInUser();
       loadMessages();
   })();
+    
     supabase link --project-ref sphrgkrajhphgppennoz
     supabase migration new new-migration
     supabase db push
@@ -2090,10 +2091,31 @@ _supabase
     if (error) console.error('Error loading data:', error);
     else renderTable(data);
 }
+    
     async function saveMember(memberData) {
     const { data, error } = await _supabase.from('members').upsert([memberData]);
     if (error) console.error('Error saving:', error);
 }
+    // Listen for live updates across the whole portal
+if (supabaseClient) {
+    supabaseClient
+        .channel('public:portal_updates')
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'transactions' }, payload => {
+            console.log("Live transaction change detected:", payload);
+            loadPortalData(); // Automatically refresh data on screen
+        })
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'members' }, payload => {
+            console.log("Live member change detected:", payload);
+            loadPortalData(); // Automatically refresh data on screen
+        })
+        .subscribe();
+}
+
+// Run when page loads
+window.addEventListener('DOMContentLoaded', () => {
+    loadPortalData();
+});
+    
     </script>
 
         <!-- FOOTER -->
