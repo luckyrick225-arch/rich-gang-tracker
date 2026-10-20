@@ -1963,8 +1963,8 @@
   (function() {
       const SUPABASE_URL = 'https://https://sphrgkrajhphgppennoz.supabase.co';
       const SUPABASE_ANON_KEY = 'sb_publishable_Mt9-vnMXeo_4E3PUwW2NPw_SnY6uIsS'; // 👈 Paste your sb_p... key here
-
-      const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+      const supabaseClient = window.supabase.createClient(supabaseUrl, supabaseKey);
+      const supabaseClient = _supabase;
 
       const chatForm = document.getElementById('chat-form');
       const chatMessages = document.getElementById('chat-messages');
@@ -2151,6 +2151,7 @@ async function saveTransactionToCloud(memberName, listName, expected, collected)
 const supabaseUrl = 'https://https://sphrgkrajhphgppennoz.supabase.co';
 const supabaseKey = 'sb_publishable_Mt9-vnMXeo_4E3PUwW2NPw_SnY6uIsS';
 const _supabase = supabase.createClient(supabaseUrl, supabaseKey);
+    const supabaseClient = _supabase;
     
 _supabase
   .channel('public:members')
