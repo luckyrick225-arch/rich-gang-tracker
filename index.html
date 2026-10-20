@@ -3593,6 +3593,7 @@ function startLiveClock() {
             window.addEventListener('resize', detectScreenView);
             document.getElementById('tx-date').valueAsDate = new Date();
             renderApp();
+    startLiveClock();
 
             // Splash Screen timing sequence (Step 1 -> Step 2)
             setTimeout(() => {
