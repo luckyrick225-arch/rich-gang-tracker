@@ -3578,23 +3578,27 @@ function startLiveClock() {
             appState.members.sort((a, b) => a.name.localeCompare(b.name, undefined, { sensitivity: 'accent' }));
         }
 
-        function initData() {
-            const savedState = localStorage.getItem('rich_gang_state');
-            if (savedState) {
-                try {
-                    const parsed = JSON.parse(savedState);
-                    if (parsed.lists) appState.lists = parsed.lists;
-                    if (parsed.members) appState.members = parsed.members;
-                    if (parsed.transactions) appState.transactions = parsed.transactions;
-                } catch (e) {}
-            }
-            sortAlphabetically();
-            detectScreenView();
-            window.addEventListener('resize', detectScreenView);
-            document.getElementById('tx-date').valueAsDate = new Date();
-            renderApp();
+        async function initData() {
+    const savedState = localStorage.getItem('rich_gang_state');
+    if (savedState) {
+        try {
+            const parsed = JSON.parse(savedState);
+            if (parsed.lists) appState.lists = parsed.lists;
+            if (parsed.members) appState.members = parsed.members;
+            if (parsed.transactions) appState.transactions = parsed.transactions;
+        } catch (e) {}
+    }
+    sortAlphabetically();
+    detectScreenView();
+    window.addEventListener('resize', detectScreenView);
+    document.getElementById('tx-date').valueAsDate = new Date();
+    renderApp();
     startLiveClock();
 
+    // Fetch fresh live data from Supabase cloud on startup
+    await loadPortalData();
+}
+        
             // Splash Screen timing sequence (Step 1 -> Step 2)
             setTimeout(() => {
                 // Reveal password gate near the end of the splash screen
