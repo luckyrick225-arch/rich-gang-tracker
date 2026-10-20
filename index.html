@@ -1960,6 +1960,7 @@
 
 <!-- Supabase JS Library -->
 <script>
+    
   (function() {
       const SUPABASE_URL = 'https://https://sphrgkrajhphgppennoz.supabase.co';
       const SUPABASE_ANON_KEY = 'sb_publishable_Mt9-vnMXeo_4E3PUwW2NPw_SnY6uIsS'; // 👈 Paste your sb_p... key here
@@ -1977,9 +1978,10 @@
 
 // 1. Load All Members & Transactions from Supabase
 async function loadPortalData() {
-    if (!supabaseClient) return;
+    if (!_supabase) return;
 
     try {
+        
         // Fetch Members
         const { data: members, error: memberError } = await supabaseClient.from('members').select('*');
         if (memberError) console.error("Error loading members:", memberError.message);
@@ -2017,7 +2019,7 @@ async function addMemberToCloud(name, role, phone) {
 
 // 1. Fetch All Lists / Contributions from Cloud
 async function fetchCloudData() {
-    if (!supabaseClient) return;
+   if (!_supabase) return;
 
     const { data: transactions, error } = await supabaseClient
         .from('transactions')
@@ -2033,7 +2035,7 @@ async function fetchCloudData() {
 
 // 2. Save/Update a Contribution or List Receipt in the Cloud
 async function saveTransactionToCloud(memberName, listName, expected, collected) {
-    if (!supabaseClient) return;
+    if (!_supabase) return;
 
     const { data, error } = await supabaseClient
         .from('transactions')
@@ -2130,24 +2132,20 @@ async function saveTransactionToCloud(memberName, listName, expected, collected)
           }
       });
 
+  
       // Realtime Listener
-      supabaseClient
-          .channel('public:messages')
-          .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'messages' }, payload => {
-              appendMessage(payload.new);
-              chatMessages.scrollTop = chatMessages.scrollHeight;
-          })
-          .subscribe();
+_supabase
+    .channel('public:messages')
+    .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'messages' }, payload => {
+        appendMessage(payload.new);
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+    })
+      .subscribe();
 
       // Initialize
       detectLoggedInUser();
       loadMessages();
   })();
-    
-const supabaseUrl = 'https://https://sphrgkrajhphgppennoz.supabase.co';
-const supabaseKey = 'sb_publishable_Mt9-vnMXeo_4E3PUwW2NPw_SnY6uIsS';
-const _supabase = supabase.createClient(supabaseUrl, supabaseKey);
-    const supabaseClient = _supabase;
     
 _supabase
   .channel('public:members')
