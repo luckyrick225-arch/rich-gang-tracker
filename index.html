@@ -2079,63 +2079,22 @@
       detectLoggedInUser();
       loadMessages();
   })();
-
-    // Professional Clocking Timestamp Engine
-function startLiveTimestamp() {
-    function updateClock() {
-        const now = new Date();
-
-        // Format Date (e.g., Sun, 18 Oct 2026)
-        const optionsDate = { weekday: 'short', day: '2-digit', month: 'short', year: 'numeric' };
-        const dateString = now.toLocaleDateString('en-GB', optionsDate);
-
-        // Format Time (HH:MM:SS)
-        const hours = String(now.getHours()).padStart(2, '0');
-        const minutes = String(now.getMinutes()).padStart(2, '0');
-        const seconds = String(now.getSeconds()).padStart(2, '0');
-        const timeString = `${hours}:${minutes}:${seconds}`;
-
-        // Inject into HTML elements
-        const dateEl = document.getElementById('liveDate');
-        const timeEl = document.getElementById('liveTime');
-
-        if (dateEl) dateEl.textContent = dateString;
-        if (timeEl) timeEl.textContent = timeString;
-    }
-
-    // Run immediately on page load and update every 1000ms (1 sec)
-    updateClock();
-    setInterval(updateClock, 1000);
-}
-
-// Start the timestamp on page ready
-window.addEventListener('DOMContentLoaded', startLiveTimestamp);
-
-        // Track Live Presence / Active Users
-if (supabaseClient) {
-    const presenceChannel = supabaseClient.channel('online-users');
-
-    presenceChannel
-        .on('presence', { event: 'sync' }, () => {
-            const state = presenceChannel.presenceState();
-            // Count total online connections
-            const activeCount = Object.keys(state).length || 1; 
-            
-            const countElement = document.getElementById('onlineCount');
-            if (countElement) {
-                countElement.textContent = activeCount;
-            }
-        })
-        .subscribe(async (status) => {
-            if (status === 'SUBSCRIBED') {
-                // Send current logged-in user details to the presence room
-                await presenceChannel.track({
-                    user: typeof currentUser !== 'undefined' ? currentUser : 'Member',
-                    online_at: new Date().toISOString()
-                });
-            }
-        });
-}
+    supabase link --project-ref sphrgkrajhphgppennoz
+    supabase migration new new-migration
+    supabase db push
+    
+const supabaseUrl = 'https://sphrgkrajhphgppennoz.supabase.co';
+const supabaseKey = 'sb_publishable_Mt9-vnMXeo_4E3PUwW2NPw_SnY6uIsS';
+const _supabase = supabase.createClient(supabaseUrl, supabaseKey);
+    
+_supabase
+  .channel('public:members')
+  .on('postgres_changes', { event: '*', schema: 'public', table: 'members' }, payload => {
+      // Automatically refresh your table UI when a change happens anywhere
+      loadMembers();
+  })
+  .subscribe();
+    
     </script>
 
         <!-- FOOTER -->
