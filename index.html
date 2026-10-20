@@ -159,39 +159,7 @@
                     <div>
                         <h1 class="text-lg font-extrabold tracking-tight text-white flex items-center gap-2">
                             Rich Gang Group
-                            <!-- Professional Live Clock Widget (Replaces Top-Right Buttons) -->
-<div class="flex items-center gap-1.5 bg-slate-900/90 border border-slate-700 px-3 py-2 rounded-xl shadow-md font-mono text-xs text-white">
-    <!-- Pulsing Live Dot -->
-    <span class="relative flex h-2 w-2">
-        <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-        <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
-    </span>
-
-    <!-- Time & Date -->
-    <div class="flex items-center gap-1.5">
-        <span id="liveDate" class="text-slate-400 text-[10px]">Tue, 20 Oct 2026</span>
-        <span class="text-slate-600">|</span>
-        <span id="liveTime" class="text-emerald-400 font-bold tracking-tight">13:52:47</span>
-    </div>
-</div>
-                            <span id="mode-badge" class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/30" hidden="">Editor Mode</span>
-                            <span id="view-mode-indicator" class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-400 border border-amber-500/30">Phone View</span>
-                        </h1>
-                        <p class="text-xs text-slate-400">Designer: <span class="text-amber-400 font-semibold">Luwagga Derick</span> • <a href="tel:+256768350920" class="text-emerald-400 underline">+256768350920</a></p>
-                    </div>
-                </div>
-                <!-- Live System Status Badge -->
-<div class="flex items-center gap-2 bg-slate-900/80 border border-emerald-500/30 px-3 py-1.5 rounded-full shadow-sm">
-    <span class="relative flex h-3 w-3">
-        <!-- Pulsing green dot animation -->
-        <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-        <span class="relative inline-flex rounded-full h-3 w-3 bg-emerald-500"></span>
-    </span>
-    <span class="text-xs font-semibold text-emerald-400 tracking-wide uppercase">SYSTEM LIVE</span>
-    <span class="text-xs text-slate-400 font-mono">| <span id="onlineCount" class="text-white font-bold">1</span> Online</span>
-</div>
-
-                <!-- Member Actions & Role Switcher -->
+          <!-- Member Actions & Role Switcher -->
                 <div class="flex flex-wrap items-center gap-1.5">
                     <button onclick="openTransactionsModal()" class="px-3 py-1.5 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 text-slate-950 font-extrabold rounded-lg text-xs flex items-center gap-1.5 shadow-md transition">
                         <i class="fa-solid fa-receipt"></i> Transactions &amp; Account
@@ -2065,76 +2033,109 @@
           }
       });
 
-      // Realtime Listener
-      supabaseClient
-          .channel('public:messages')
-          .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'messages' }, payload => {
-              appendMessage(payload.new);
-              chatMessages.scrollTop = chatMessages.scrollHeight;
-          })
-          .subscribe();
+     // Realtime Listener
+_supabase
+    .channel('public:messages')
+    .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'messages' }, payload => {
+        appendMessage(payload.new);
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+    })
 
       // Initialize
       detectLoggedInUser();
       loadMessages();
   })();
+        
+        const supabaseUrl = 'https://sphrgkrajhphgppennoz.supabase.co';
+const supabaseKey = 'sb_publishable_Mt9-vnMXeo_4E3PUwW2NPw_SnY6uIsS'; 
+const _supabase = supabase.createClient(supabaseUrl, supabaseKey);
+const supabaseClient = _supabase; // 👈 This makes BOTH names work simultaneously!
+    // ==========================================
+// PORTAL CLOUD DATA FUNCTIONS
+// ==========================================
 
-    // Professional Clocking Timestamp Engine
-function startLiveTimestamp() {
-    function updateClock() {
-        const now = new Date();
+// 1. Load All Members & Transactions from Supabase
+async function loadPortalData() {
+    if (!supabaseClient) return;
 
-        // Format Date (e.g., Sun, 18 Oct 2026)
-        const optionsDate = { weekday: 'short', day: '2-digit', month: 'short', year: 'numeric' };
-        const dateString = now.toLocaleDateString('en-GB', optionsDate);
+    try {
+        // Fetch Members
+        const { data: members, error: memberError } = await supabaseClient.from('members').select('*');
+        if (memberError) console.error("Error loading members:", memberError.message);
+        else console.log("Loaded members from cloud:", members);
 
-        // Format Time (HH:MM:SS)
-        const hours = String(now.getHours()).padStart(2, '0');
-        const minutes = String(now.getMinutes()).padStart(2, '0');
-        const seconds = String(now.getSeconds()).padStart(2, '0');
-        const timeString = `${hours}:${minutes}:${seconds}`;
+        // Fetch Transactions/Contributions
+        const { data: transactions, error: txError } = await supabaseClient.from('transactions').select('*');
+        if (txError) console.error("Error loading transactions:", txError.message);
+        else console.log("Loaded transactions from cloud:", transactions);
 
-        // Inject into HTML elements
-        const dateEl = document.getElementById('liveDate');
-        const timeEl = document.getElementById('liveTime');
+        // TODO: Pass 'members' and 'transactions' into your UI rendering functions here
+    } catch (err) {
+        console.error("Cloud data fetch failed:", err);
+    }
+}
 
-        if (dateEl) dateEl.textContent = dateString;
-        if (timeEl) timeEl.textContent = timeString;
+// 2. Save a New Member or Transaction Live
+async function addMemberToCloud(name, role, phone) {
+    if (!supabaseClient) return;
+
+    const { data, error } = await supabaseClient
+        .from('members')
+        .insert([{ name: name, role: role, phone: phone }]);
+
+    if (error) {
+        alert("Failed to save member: " + error.message);
+    } else {
+        console.log("Member saved to cloud successfully!");
+        loadPortalData(); // Refresh data
+    }
+}
+async function togglePayment(memberId, listId, isChecked) {
+    if (!_supabase) return;
+
+    // 1. Update local state immediately for instant feedback
+    const member = appState.members.find(m => m.id === memberId);
+    if (member) {
+        if (!member.payments) member.payments = {};
+        member.payments[listId] = isChecked;
+        renderApp();
     }
 
-    // Run immediately on page load and update every 1000ms (1 sec)
-    updateClock();
-    setInterval(updateClock, 1000);
+    // 2. Command Supabase to persist the update in the cloud
+    const { error } = await _supabase
+        .from('members')
+        .update({ payments: member.payments })
+        .eq('id', memberId);
+
+    if (error) {
+        console.error("Failed to sync payment toggle to cloud:", error.message);
+        showToast("Cloud sync error!");
+    } else {
+        console.log("Payment status synced to Supabase!");
+    }
 }
-
-// Start the timestamp on page ready
-window.addEventListener('DOMContentLoaded', startLiveTimestamp);
-
-        // Track Live Presence / Active Users
-if (supabaseClient) {
-    const presenceChannel = supabaseClient.channel('online-users');
-
-    presenceChannel
-        .on('presence', { event: 'sync' }, () => {
-            const state = presenceChannel.presenceState();
-            // Count total online connections
-            const activeCount = Object.keys(state).length || 1; 
-            
-            const countElement = document.getElementById('onlineCount');
-            if (countElement) {
-                countElement.textContent = activeCount;
-            }
+    
+    // Listen for live updates across the whole portal
+if (_supabase) {
+    _supabase
+        .channel('public:rich_gang_all_updates')
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'members' }, payload => {
+            console.log("Member change detected from cloud:", payload);
+            loadPortalData(); // Refresh app data automatically
         })
-        .subscribe(async (status) => {
-            if (status === 'SUBSCRIBED') {
-                // Send current logged-in user details to the presence room
-                await presenceChannel.track({
-                    user: typeof currentUser !== 'undefined' ? currentUser : 'Member',
-                    online_at: new Date().toISOString()
-                });
-            }
-        });
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'transactions' }, payload => {
+            console.log("Transaction change detected from cloud:", payload);
+            loadPortalData(); // Refresh app data automatically
+        })
+        .subscribe();
 }
+}
+
+// Run when page loads
+window.addEventListener('DOMContentLoaded', () => {
+    loadPortalData();
+});
+    
     </script>
 
         <!-- FOOTER -->
