@@ -1981,6 +1981,47 @@
       const chatInput = document.getElementById('chat-input');
       const chatName = document.getElementById('chat-name');
 
+    // ==========================================
+// PORTAL CLOUD DATA FUNCTIONS
+// ==========================================
+
+// 1. Load All Members & Transactions from Supabase
+async function loadPortalData() {
+    if (!supabaseClient) return;
+
+    try {
+        // Fetch Members
+        const { data: members, error: memberError } = await supabaseClient.from('members').select('*');
+        if (memberError) console.error("Error loading members:", memberError.message);
+        else console.log("Loaded members from cloud:", members);
+
+        // Fetch Transactions/Contributions
+        const { data: transactions, error: txError } = await supabaseClient.from('transactions').select('*');
+        if (txError) console.error("Error loading transactions:", txError.message);
+        else console.log("Loaded transactions from cloud:", transactions);
+
+        // TODO: Pass 'members' and 'transactions' into your UI rendering functions here
+    } catch (err) {
+        console.error("Cloud data fetch failed:", err);
+    }
+}
+
+// 2. Save a New Member or Transaction Live
+async function addMemberToCloud(name, role, phone) {
+    if (!supabaseClient) return;
+
+    const { data, error } = await supabaseClient
+        .from('members')
+        .insert([{ name: name, role: role, phone: phone }]);
+
+    if (error) {
+        alert("Failed to save member: " + error.message);
+    } else {
+        console.log("Member saved to cloud successfully!");
+        loadPortalData(); // Refresh data
+    }
+}
+
       // Auto-detect logged in portal user name
       function detectLoggedInUser() {
           let loggedName = 'Guest Member';
