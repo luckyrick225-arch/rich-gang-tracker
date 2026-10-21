@@ -161,36 +161,12 @@
                             Rich Gang Group
                             <!-- Professional Live Clock Widget (Replaces Top-Right Buttons) -->
 <div class="flex items-center gap-1.5 bg-slate-900/90 border border-slate-700 px-3 py-2 rounded-xl shadow-md font-mono text-xs text-white">
-    <!-- Pulsing Live Dot -->
-    <span class="relative flex h-2 w-2">
-        <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-        <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
-    </span>
-
-    <!-- Time & Date -->
-    <div class="flex items-center gap-1.5">
-        <span id="liveDate" class="text-slate-400 text-[10px]">Tue, 20 Oct 2026</span>
-        <span class="text-slate-600">|</span>
-        <span id="liveTime" class="text-emerald-400 font-bold tracking-tight">13:52:47</span>
-    </div>
-</div>
-                            <span id="mode-badge" class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/30" hidden="">Editor Mode</span>
+                     <span id="mode-badge" class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/30" hidden="">Editor Mode</span>
                             <span id="view-mode-indicator" class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-400 border border-amber-500/30">Phone View</span>
                         </h1>
                         <p class="text-xs text-slate-400">Designer: <span class="text-amber-400 font-semibold">Luwagga Derick</span> • <a href="tel:+256768350920" class="text-emerald-400 underline">+256768350920</a></p>
                     </div>
                 </div>
-                <!-- Live System Status Badge -->
-<div class="flex items-center gap-2 bg-slate-900/80 border border-emerald-500/30 px-3 py-1.5 rounded-full shadow-sm">
-    <span class="relative flex h-3 w-3">
-        <!-- Pulsing green dot animation -->
-        <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-        <span class="relative inline-flex rounded-full h-3 w-3 bg-emerald-500"></span>
-    </span>
-    <span class="text-xs font-semibold text-emerald-400 tracking-wide uppercase">SYSTEM LIVE</span>
-    <span class="text-xs text-slate-400 font-mono">| <span id="onlineCount" class="text-white font-bold">1</span> Online</span>
-</div>
-
                 <!-- Member Actions & Role Switcher -->
                 <div class="flex flex-wrap items-center gap-1.5">
                     <button onclick="openTransactionsModal()" class="px-3 py-1.5 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 text-slate-950 font-extrabold rounded-lg text-xs flex items-center gap-1.5 shadow-md transition">
@@ -2044,73 +2020,6 @@ if (supabaseClient) {
             loadPortalData(); // Automatically refresh data on screen
         })
         .subscribe();
-}
-      
-      // Example: Fetching welfare payouts in your existing app
-const { data, error } = await supabase
-  .from('welfare_payouts')
-  .select('*, members(name)')
-
-// Run when page loads
-window.addEventListener('DOMContentLoaded', () => {
-    loadPortalData();
-});
-      
-    // Professional Clocking Timestamp Engine
-function startLiveTimestamp() {
-    function updateClock() {
-        const now = new Date();
-
-        // Format Date (e.g., Sun, 18 Oct 2026)
-        const optionsDate = { weekday: 'short', day: '2-digit', month: 'short', year: 'numeric' };
-        const dateString = now.toLocaleDateString('en-GB', optionsDate);
-
-        // Format Time (HH:MM:SS)
-        const hours = String(now.getHours()).padStart(2, '0');
-        const minutes = String(now.getMinutes()).padStart(2, '0');
-        const seconds = String(now.getSeconds()).padStart(2, '0');
-        const timeString = `${hours}:${minutes}:${seconds}`;
-
-        // Inject into HTML elements
-        const dateEl = document.getElementById('liveDate');
-        const timeEl = document.getElementById('liveTime');
-
-        if (dateEl) dateEl.textContent = dateString;
-        if (timeEl) timeEl.textContent = timeString;
-    }
-
-    // Run immediately on page load and update every 1000ms (1 sec)
-    updateClock();
-    setInterval(updateClock, 1000);
-}
-
-// Start the timestamp on page ready
-window.addEventListener('DOMContentLoaded', startLiveTimestamp);
-
-        // Track Live Presence / Active Users
-if (supabaseClient) {
-    const presenceChannel = supabaseClient.channel('online-users');
-
-    presenceChannel
-        .on('presence', { event: 'sync' }, () => {
-            const state = presenceChannel.presenceState();
-            // Count total online connections
-            const activeCount = Object.keys(state).length || 1; 
-            
-            const countElement = document.getElementById('onlineCount');
-            if (countElement) {
-                countElement.textContent = activeCount;
-            }
-        })
-        .subscribe(async (status) => {
-            if (status === 'SUBSCRIBED') {
-                // Send current logged-in user details to the presence room
-                await presenceChannel.track({
-                    user: typeof currentUser !== 'undefined' ? currentUser : 'Member',
-                    online_at: new Date().toISOString()
-                });
-            }
-        });
 }
     </script>
 
