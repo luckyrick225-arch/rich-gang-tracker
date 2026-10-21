@@ -1936,7 +1936,6 @@
         </div>
         
         <script>
-<!-- Supabase JS Library -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
   (function() {
@@ -1959,6 +1958,39 @@
         console.log("Successfully saved:", data);
         alert("Contribution recorded successfully!");
         
+            
+            async function updateMemberStatus(memberId, newStatus) {
+    // 1. Update database in the background
+    const { error } = await supabase
+        .from('members')
+        .update({ status: newStatus })
+        .eq('id', memberId);
+
+    if (error) {
+        console.error("Error updating status:", error);
+        return;
+    }
+            function renderTableBody(membersList) {
+    const tableBody = document.getElementById('table-body-container');
+                
+  // 2. CRITICAL: Refresh local data and re-render the table body!
+    await fetchAndRenderTableData(); 
+}
+                
+    // Clear existing rows so it doesn't hold onto "last opened data"
+    tableBody.innerHTML = ''; 
+
+    membersList.forEach(member => {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+            <td>${member.name}</td>
+            <td>${member.village}</td>
+            <td>${member.status}</td>
+        `;
+        tableBody.appendChild(row);
+    });
+}
+  
         // Refresh your local table data here
         fetchTransactions(); 
 
