@@ -1968,6 +1968,29 @@
       const SUPABASE_ANON_KEY = 'sb_publishable_Mt9-vnMXeo_4E3PUwW2NPw_SnY6uIsS'; // 👈 Paste your sb_p... key here
 
       const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+      async function saveTransaction(formData) {
+    try {
+        const { data, error } = await supabase
+            .from('transactions')
+            .insert([formData]); // e.g., { member_name: "...", amount: ... }
+
+        if (error) {
+            console.error("Supabase Save Error:", error.message, error.details);
+            alert("Failed to save: " + error.message);
+            return;
+        }
+
+        console.log("Successfully saved:", data);
+        alert("Contribution recorded successfully!");
+        
+        // Refresh your local table data here
+        fetchTransactions(); 
+
+    } catch (err) {
+        console.error("Unexpected error during save:", err);
+    }
+    }
+    
     // ==========================================
 // PORTAL CLOUD DATA FUNCTIONS
 // ==========================================
