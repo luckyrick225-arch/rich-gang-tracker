@@ -2944,6 +2944,42 @@ if (supabaseClient) {
     </div>
 
     <script>
+    let isUserEditing = false;
+
+// Set flag when user starts typing or focuses an input
+document.querySelectorAll('input, select').forEach(element => {
+    element.addEventListener('focus', () => { isUserEditing = true; });
+    element.addEventListener('blur', () => { 
+        isUserEditing = false; 
+        saveToLocalStorage(); // Save only after they finish editing
+    });
+});
+
+function backgroundSync() {
+    if (isUserEditing) {
+        console.log("Sync skipped: User is currently editing.");
+        return; // Don't let background updates overwrite active work
+    }
+    // Safe to update local storage or UI here
+}
+        
+        let saveTimeout;
+
+function handleInput(event) {
+    // Save current UI state to a temporary variable, but delay localStorage write
+    clearTimeout(saveTimeout);
+    saveTimeout = setTimeout(() => {
+        localStorage.setItem('app_draft_state', JSON.stringify(getCurrentFormData()));
+        console.log("Safely saved to localStorage after pause.");
+    }, 500); // Waits 500ms after the last keystroke
+}
+        window.addEventListener('storage', (event) => {
+    if (event.key === 'rich_gang_data' && !isUserEditing) {
+        // Only update UI from background storage if the user isn't actively typing
+        reloadUIFromStorage(event.newValue);
+    }
+});
+        
         let INITIAL_LISTS = [
     {
         "id": "list-1",
@@ -2956,7 +2992,6 @@ if (supabaseClient) {
         "target": 5000
     }
 ];
-
         let INITIAL_MEMBERS = [
     {
         "id": "mem-1",
