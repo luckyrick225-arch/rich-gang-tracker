@@ -4065,10 +4065,8 @@ function handleInput(event) {
             const portalLink = window.location.href.split('?')[0];
             const nowStr = new Date().toLocaleString('en-GB', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' });
             
-            let txt = `╔════════════════════════╗\n`;
-            txt += `    💎 *RICH GANG VOUCHER* 💎    \n`;
-            txt += `╚════════════════════════╝\n\n`;
-            txt += `🌐 *Portal:* ${portalLink}\n`;
+            
+            let txt += `    💎 *RICH GANG VOUCHER* 💎    \n`;
             txt += `⏳ *Timestamp:* ${nowStr}\n\n`;
             txt += `🧾 *Reference:* #${activeTxReceipt.id.slice(-6)}\n`;
             txt += `📅 *Date:* ${activeTxReceipt.date}\n`;
@@ -4158,11 +4156,8 @@ function handleInput(event) {
             const paidCount = countListPaidMembers(list.id);
             const nowStr = new Date().toLocaleString('en-GB', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' });
             const percentage = appState.members.length > 0 ? Math.round((paidCount / appState.members.length) * 100) : 0;
-
-            let txt = `╔════════════════════════╗\n`;
-            txt += `  🔥 *RICH GANG CONTRIBUTION* 🔥  \n`;
-            txt += `╚════════════════════════╝\n\n`;
-            txt += `🌐 *Portal:* ${portalLink}\n`;
+        
+           let txt += `   *RICH GANG CONTRIBUTION*   \n`;
             txt += `📌 *List Name:* ${list.name}\n`;
             txt += `⏳ *Timestamp:* ${nowStr}\n\n`;
             txt += `📊 *FINANCIAL SUMMARY:*\n`;
@@ -4298,11 +4293,8 @@ function handleInput(event) {
         function buildWhatsAppReportText() {
             let portalLink = window.location.href.split('?')[0];
             const nowStr = new Date().toLocaleString('en-GB', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' });
-            
-            let txt = `╔════════════════════════╗\n`;
+        
             txt += `   🏆 *RICH GANG GROUP REPORT* 🏆   \n`;
-            txt += `╚════════════════════════╝\n\n`;
-            txt += `🌐 *Portal:* ${portalLink}\n`;
             txt += `⏳ *Timestamp:* ${nowStr}\n`;
             txt += `👥 *Total Members:* ${appState.members.length}\n`;
             txt += `🏦 *Group Account Balance:* UGX ${calculateGroupAccountBalance().toLocaleString()}\n\n`;
