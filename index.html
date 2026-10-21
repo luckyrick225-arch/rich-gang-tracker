@@ -2045,16 +2045,17 @@ if (supabaseClient) {
         })
         .subscribe();
 }
+      
+      // Example: Fetching welfare payouts in your existing app
+const { data, error } = await supabase
+  .from('welfare_payouts')
+  .select('*, members(name)')
 
 // Run when page loads
 window.addEventListener('DOMContentLoaded', () => {
     loadPortalData();
 });
       
-      supabase link --project-ref sphrgkrajhphgppennoz
-      supabase migration new new-migration
-      supabase db push
-    
     // Professional Clocking Timestamp Engine
 function startLiveTimestamp() {
     function updateClock() {
